@@ -29,8 +29,6 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // 由於在瀏覽器端無法直接 import lucide-react，我們改用 SVG 函數組件或 Lucide 的全局變量
-        // 這裡定義一個簡單的圖標組件封裝
         const Icon = ({ name, className = "h-5 w-5" }) => {
             const icons = {
                 Target: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
@@ -40,7 +38,9 @@
                 Globe: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
                 Award: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>,
                 ChevronRight: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
-                CheckCircle: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                ChevronLeft: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>,
+                CheckCircle: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>,
+                Folder: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
             };
             return icons[name] || null;
         };
@@ -50,6 +50,7 @@
         const App = () => {
             const [activeTab, setActiveTab] = useState('all');
             const [searchTerm, setSearchTerm] = useState('');
+            const [selectedCourse, setSelectedCourse] = useState(null);
 
             const courseData = [
                 {
@@ -58,7 +59,9 @@
                     title: '字音字形深度辨正',
                     status: '核心',
                     description: '針對小升初常見易讀錯、易寫錯的形音義進行系統化解析，建立紮實的文字功底。',
-                    tags: ['破音字', '形似字', '同音字']
+                    tags: ['破音字', '形似字', '同音字'],
+                    folderPrefix: 'lesson1',
+                    subFolderCount: 12
                 },
                 {
                     id: 2,
@@ -66,7 +69,9 @@
                     title: '高頻成語應用與辨析',
                     status: '必考',
                     description: '歸納歷屆私中考試核心成語，涵蓋人物描寫、情境運用與反義近義詞深度辨析。',
-                    tags: ['情境運用', '出處典故', '成語填空']
+                    tags: ['情境運用', '出處典故', '成語填空'],
+                    folderPrefix: 'lesson2',
+                    subFolderCount: 2
                 },
                 {
                     id: 3,
@@ -111,37 +116,18 @@
                 return matchesSearch && matchesTab;
             });
 
-            return (
-                <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-12">
-                    {/* Header */}
-                    <header className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg sticky top-0 z-50">
-                        <div className="max-w-6xl mx-auto px-4 py-6">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div>
-                                    <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                                        <Icon name="Target" className="text-yellow-400 h-8 w-8" />
-                                        金名升私中特訓班 - 國語科
-                                    </h1>
-                                    <p className="mt-2 text-blue-100 flex items-center gap-2">
-                                        <Icon name="Layout" className="h-4 w-4" /> 內部教學系統 · 課程總目錄
-                                    </p>
-                                </div>
-                                <div className="relative">
-                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300">
-                                        <Icon name="Search" />
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        placeholder="搜尋教學單元..." 
-                                        className="pl-10 pr-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-blue-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full md:w-64 backdrop-blur-sm"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </header>
+            const handleStartLearning = (course) => {
+                if (course.folderPrefix && course.subFolderCount) {
+                    setSelectedCourse(course);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    // Placeholder for courses without subfolders
+                    console.log("此課程暫無子目錄");
+                }
+            };
 
+            const renderMainList = () => (
+                <>
                     {/* Hero Section */}
                     <div className="bg-white border-b">
                         <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -175,7 +161,6 @@
                         </div>
                     </div>
 
-                    {/* Main Content */}
                     <main className="max-w-6xl mx-auto px-4 mt-8">
                         {/* Category Tabs */}
                         <div className="flex overflow-x-auto pb-4 gap-2 scrollbar-hide">
@@ -227,7 +212,10 @@
                                             </div>
                                         </div>
                                         <div className="mt-auto border-t border-slate-50 bg-slate-50/50 p-4 flex items-center justify-end">
-                                            <button className="flex items-center gap-1 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors group/btn">
+                                            <button 
+                                                onClick={() => handleStartLearning(course)}
+                                                className="flex items-center gap-1 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors group/btn"
+                                            >
                                                 開始學習
                                                 <Icon name="ChevronRight" className="h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
                                             </button>
@@ -249,44 +237,133 @@
                                 </div>
                             )}
                         </div>
+                    </main>
+                </>
+            );
 
-                        {/* Bottom Banner */}
-                        <div className="mt-12 bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
-                            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-                                <div>
-                                    <h2 className="text-2xl md:text-3xl font-extrabold mb-2 italic">私中特訓 · 實力登頂</h2>
-                                    <p className="text-indigo-200 max-w-lg">
-                                        金名升私中團隊獨家研發教學系統，整合多元教學資源，專為頂尖學生量身打造的國語科特訓課程。
-                                    </p>
-                                    <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-4">
-                                        <div className="flex items-center gap-2">
-                                            <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
-                                            <span className="text-sm font-medium">系統化觀念梳理</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
-                                            <span className="text-sm font-medium">個人化錯題追蹤</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
-                                            <span className="text-sm font-medium">考場作答技巧</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-3 min-w-[200px]">
-                                    <button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-xl shadow-lg transition-transform hover:-translate-y-1 active:translate-y-0 text-center">
-                                        進入學習系統
-                                    </button>
-                                    <button className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-xl transition-colors text-center backdrop-blur-sm border border-white/20">
-                                        下載學習進度表
-                                    </button>
-                                </div>
+            const renderSubFolders = () => {
+                const folders = Array.from({ length: selectedCourse.subFolderCount }, (_, i) => i + 1);
+                
+                return (
+                    <main className="max-w-6xl mx-auto px-4 mt-8 pb-20">
+                        <div className="mb-6 flex items-center justify-between">
+                            <button 
+                                onClick={() => setSelectedCourse(null)}
+                                className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-medium transition-colors"
+                            >
+                                <Icon name="ChevronLeft" />
+                                返回課程列表
+                            </button>
+                            <div className="flex items-center gap-3">
+                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold uppercase">
+                                    {selectedCourse.category}
+                                </span>
+                                <h2 className="text-2xl font-bold text-slate-800">{selectedCourse.title}</h2>
                             </div>
-                            {/* Background effects */}
-                            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-                            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
+                        </div>
+
+                        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-8">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                {folders.map(num => (
+                                    <a 
+                                        key={num}
+                                        href={`./${selectedCourse.folderPrefix}/${num}/index.html`}
+                                        className="group flex flex-col items-center gap-3 p-4 rounded-2xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all duration-300"
+                                    >
+                                        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
+                                            <Icon name="Folder" className="h-8 w-8" />
+                                        </div>
+                                        <span className="font-bold text-slate-700 group-hover:text-blue-700">單元 {num}</span>
+                                        <span className="text-[10px] text-slate-400 font-medium uppercase group-hover:text-blue-400">Index.html</span>
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="mt-8 bg-blue-50 rounded-2xl p-6 border border-blue-100">
+                            <h4 className="font-bold text-blue-900 mb-2 italic">學習提醒</h4>
+                            <p className="text-sm text-blue-700 leading-relaxed">
+                                請依序點擊上方資料夾進入對應的學習頁面。每個資料夾均包含獨立的教學影片、講義練習及隨堂測驗。若有任何操作問題，請聯繫班導師尋求協助。
+                            </p>
                         </div>
                     </main>
+                );
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-12">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg sticky top-0 z-50">
+                        <div className="max-w-6xl mx-auto px-4 py-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div className="cursor-pointer" onClick={() => setSelectedCourse(null)}>
+                                    <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+                                        <Icon name="Target" className="text-yellow-400 h-8 w-8" />
+                                        金名升私中特訓班 - 國語科
+                                    </h1>
+                                    <p className="mt-2 text-blue-100 flex items-center gap-2">
+                                        <Icon name="Layout" className="h-4 w-4" /> 內部教學系統 · {selectedCourse ? '單元詳情' : '課程總目錄'}
+                                    </p>
+                                </div>
+                                {!selectedCourse && (
+                                    <div className="relative">
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300">
+                                            <Icon name="Search" />
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            placeholder="搜尋教學單元..." 
+                                            className="pl-10 pr-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-blue-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full md:w-64 backdrop-blur-sm"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </header>
+
+                    {selectedCourse ? renderSubFolders() : renderMainList()}
+
+                    {/* Bottom Banner - Only show on main list */}
+                    {!selectedCourse && (
+                        <div className="max-w-6xl mx-auto px-4 mt-12">
+                            <div className="bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
+                                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+                                    <div>
+                                        <h2 className="text-2xl md:text-3xl font-extrabold mb-2 italic">私中特訓 · 實力登頂</h2>
+                                        <p className="text-indigo-200 max-w-lg">
+                                            金名升私中團隊獨家研發教學系統，整合多元教學資源，專為頂尖學生量身打造的國語科特訓課程。
+                                        </p>
+                                        <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-4">
+                                            <div className="flex items-center gap-2">
+                                                <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
+                                                <span className="text-sm font-medium">系統化觀念梳理</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
+                                                <span className="text-sm font-medium">個人化錯題追蹤</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
+                                                <span className="text-sm font-medium">考場作答技巧</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-3 min-w-[200px]">
+                                        <button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-xl shadow-lg transition-transform hover:-translate-y-1 active:translate-y-0 text-center">
+                                            進入學習系統
+                                        </button>
+                                        <button className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-xl transition-colors text-center backdrop-blur-sm border border-white/20">
+                                            下載學習進度表
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+                                <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Footer */}
                     <footer className="mt-12 py-10 border-t border-slate-200 text-center text-slate-400">
