@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升私中特訓班 - 代名詞與所有格魔導書 V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        :root {
+            --magic-purple: #6b46c1;
+            --magic-gold: #ecc94b;
+            --magic-deep: #1a1a2e;
+            --magic-red: #e53e3e;
+            --magic-green: #38a169;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .magic-font { font-family: 'Nova Script', cursive; }
+
+        /* 羊皮紙卷軸樣式 */
+        .scroll-container {
+            background: #fdf5e6;
+            color: #4a3728;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.6), inset 0 0 100px rgba(139, 69, 19, 0.15);
+            border: 10px solid #8b4513;
+            position: relative;
+        }
+
+        .scroll-container::before, .scroll-container::after {
+            content: '';
+            position: absolute;
+            height: 115%;
+            width: 45px;
+            background: linear-gradient(to right, #5d2906, #8b4513, #5d2906);
+            top: -7.5%;
+            border-radius: 25px;
+            z-index: 10;
+        }
+        .scroll-container::before { left: -35px; }
+        .scroll-container::after { right: -35px; }
+
+        /* 題目卡片 */
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(236, 201, 75, 0.1);
+            border-color: var(--magic-gold);
+        }
+
+        .option-correct {
+            background: var(--magic-green) !important;
+            border-color: #48bb78 !important;
+            color: white !important;
+        }
+
+        .option-wrong {
+            background: var(--magic-red) !important;
+            border-color: #feb2b2 !important;
+            color: white !important;
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: #fff;
+            border-radius: 50%;
+            animation: sparkleAnim 0.8s linear forwards;
+            z-index: 100;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: translate(0,0) scale(1.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        .floating { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* 導航按鈕狀態 */
+        .nav-btn-correct { background-color: var(--magic-green) !important; color: white !important; }
+        .nav-btn-wrong { background-color: var(--magic-red) !important; color: white !important; }
+        .nav-btn-current { border: 3px solid var(--magic-gold) !important; transform: scale(1.15); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: #4a3728; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="text-center mb-12 relative">
+        <div class="inline-block relative">
+            <h1 class="text-5xl md:text-7xl font-bold magic-font text-yellow-400 mb-4 drop-shadow-[0_0_15px_rgba(236,201,75,0.8)] floating">
+                JingMing Magic Academy
+            </h1>
+            <p class="text-xl md:text-2xl text-purple-300 font-bold tracking-widest italic">代名詞 100 題：全選擇魔導修煉</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-16">
+        
+        <!-- 知識對照表 (保持原樣供參考) -->
+        <section class="scroll-container p-8 md:p-10 mx-4 hidden lg:block">
+            <h2 class="text-3xl font-bold text-amber-900 mb-6">📜 魔法對照表</h2>
+            <div class="overflow-x-auto rounded-lg bg-white/40 p-1">
+                <table class="w-full text-center border-collapse">
+                    <thead>
+                        <tr class="bg-amber-900 text-amber-50">
+                            <th class="p-2 border border-amber-800">人稱</th>
+                            <th class="p-2 border border-amber-800">主格</th>
+                            <th class="p-2 border border-amber-800">賓格</th>
+                            <th class="p-2 border border-amber-800">所有格形</th>
+                            <th class="p-2 border border-amber-800">所有格代</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pronounTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 魔法試煉場 -->
+        <section class="relative bg-black/20 p-6 md:p-10 rounded-[3rem] border border-white/5">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center text-blue-900 text-3xl shadow-lg">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-4xl font-bold">當前試煉</h2>
+                        <p class="text-gray-400">進度：<span id="progress-text" class="text-yellow-400 font-bold">1/100</span></p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="toggleMistakeSummary()" class="bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 text-red-100 px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                        <i class="fas fa-book-dead"></i> 錯題彙整 (<span id="wrong-count">0</span>)
+                    </button>
+                    <div class="bg-black/40 px-6 py-3 rounded-xl border border-white/10 text-center">
+                        <p class="text-xs text-gray-400 uppercase">總分</p>
+                        <p id="score" class="text-2xl font-bold text-yellow-400">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 題目渲染區 -->
+            <div id="quiz-wrapper" class="min-h-[350px]"></div>
+
+            <!-- 100題 分頁導航 -->
+            <div class="mt-12">
+                <p class="text-sm text-gray-500 mb-4 text-center">快速傳送門 (點擊切換題目)</p>
+                <div class="flex flex-wrap justify-center gap-2 overflow-y-auto max-h-40 p-4 bg-black/30 rounded-2xl" id="pagination-grid"></div>
+            </div>
+        </section>
+
+        <!-- 錯題彙整區 (預設隱藏) -->
+        <section id="mistake-section" class="hidden animate-in fade-in slide-in-from-bottom-10 duration-500">
+            <div class="bg-red-950/30 border border-red-500/30 p-8 rounded-[3rem]">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-red-400 flex items-center gap-3">
+                        <i class="fas fa-skull-crossbones"></i> 錯題筆記本
+                    </h2>
+                    <button onclick="toggleMistakeSummary()" class="text-gray-400 hover:text-white">關閉 <i class="fas fa-times"></i></button>
+                </div>
+                <div id="mistake-list" class="space-y-4">
+                    <p class="text-gray-500 italic">目前沒有錯題，保持下去！</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-24 py-12 border-t border-white/10 text-gray-500">
+        <p class="text-lg">金名升私中特訓班 - 英語魔導課程 V2.0</p>
+    </footer>
+
+    <!-- 慶祝彈窗 -->
+    <div id="celebration-modal" class="fixed inset-0 bg-black/95 hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-indigo-950 to-black p-12 rounded-[40px] border-4 border-yellow-400 text-center max-w-lg w-full">
+            <h3 class="text-5xl font-bold text-yellow-400 mb-6">🏆 傳奇大魔導！</h3>
+            <p class="text-xl text-purple-200 mb-4">你已完成所有 100 題試煉。</p>
+            <div id="final-stats" class="text-white mb-8 text-lg"></div>
+            <button onclick="location.reload()" class="bg-yellow-400 text-black px-12 py-4 rounded-full font-bold text-xl hover:bg-yellow-300 transition-all">
+                重新修煉
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 數據定義 ---
+        const pronounData = [
+            { person: '第一人稱單數', sub: 'I', obj: 'me', adj: 'my', pron: 'mine' },
+            { person: '第二人稱單數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours' },
+            { person: '第三人稱單數(男)', sub: 'He', obj: 'him', adj: 'his', pron: 'his' },
+            { person: '第三人稱單數(女)', sub: 'She', obj: 'her', adj: 'her', pron: 'hers' },
+            { person: '第三人稱單數(物)', sub: 'It', obj: 'it', adj: 'its', pron: 'its' },
+            { person: '第一人稱複數', sub: 'We', obj: 'us', adj: 'our', pron: 'ours' },
+            { person: '第二人稱複數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours' },
+            { person: '第三人稱複數', sub: 'They', obj: 'them', adj: 'their', pron: 'theirs' }
+        ];
+
+        // 題目池
+        let questions = [];
+        let userResponses = new Array(100).fill(null); // { selectedIdx: number, isCorrect: boolean }
+
+        // 生成 100 題選擇題
+        function generateQuestions() {
+            // 前 15 題手動優化題 (來自原圖)
+            const manualQ = [
+                { q: "______ is Vicky, and he is Kenny.", opts: ["I", "You", "She", "Its"], a: 2, hint: "Vicky 是女生名，主詞用 She。" },
+                { q: "______ is my sister. ______ name is Karen.", opts: ["She; Her", "He; His", "He; Her", "Her; She"], a: 0, hint: "女生主格 She，所有格 Her。" },
+                { q: "Aaron: What a cute puppy! Betty: ______ name is Lucky.", opts: ["Its", "It's", "It", "It is"], a: 0, hint: "它的所有格是 Its (無撇號)。" },
+                { q: "Rick: Emma, is Amy ______ mother? Emma: No, she is not ______ mother.", opts: ["your; my", "your; your", "her; his", "your; her"], a: 0, hint: "對話對應：問『你的』答『我的』。" },
+                { q: "That is ______ desk.", opts: ["us", "I", "she", "her"], a: 3, hint: "名詞 desk 前需要所有格形容詞。" },
+                { q: "Today is ______ birthday.", opts: ["Tim", "Daisy's", "Helen", "he"], a: 1, hint: "名字後加 's 表示所有格。" },
+                { q: "These are the three ______ toy cars.", opts: ["a boy's", "boys'", "a boy", "boys"], a: 1, hint: "複數 s 結尾只需加 '。" },
+                { q: "Renee is ______ daughter. I'm ______ mother.", opts: ["my; her", "my; my", "her; her", "her; my"], a: 0, hint: "我是她的媽媽，她是我的女兒。" },
+                { q: "She is ______ mother. Chip and Ben are brothers.", opts: ["Chip's and Ben's", "Chip's and Ben", "Chip and Ben", "Chip and Ben's"], a: 3, hint: "共同擁有的媽媽，最後一個名字加 's。" },
+                { q: "Mary is my sister. = ______ is my sister.", opts: ["She", "He", "Her", "It"], a: 0, hint: "Mary 的主格代名詞。" },
+                { q: "We are students. Ms. Smith is ______ teacher.", opts: ["her", "our", "their", "your"], a: 1, hint: "We 對應 our。" },
+                { q: "Peter and Viper are brothers. Cinderella is ______ mother.", opts: ["she's", "their", "they're", "his"], a: 1, hint: "複數(他們)的所有格。" },
+                { q: "______ is our classmate. ______ name is Amanda.", opts: ["He; Her", "He; His", "She; Her", "Her; She"], a: 2, hint: "Amanda 是女生。" },
+                { q: "Is this pen ______? No, it's not mine.", opts: ["you", "your", "yours", "me"], a: 2, hint: "獨立使用的所有格代名詞。" },
+                { q: "Those books are ______. They are not his.", opts: ["they", "them", "their", "theirs"], a: 3, hint: "獨立使用的所有格代名詞。" }
+            ];
+
+            questions = [...manualQ];
+
+            // 補充到 100 題
+            const types = ['sub', 'obj', 'adj', 'pron'];
+            for(let i = questions.length; i < 100; i++) {
+                const row = pronounData[Math.floor(Math.random() * pronounData.length)];
+                const type = types[Math.floor(Math.random() * types.length)];
+                let qText, correct, hint;
+
+                if(type === 'sub') {
+                    qText = `(人稱：${row.person}) ______ like to play basketball.`;
+                    correct = row.sub; hint = `主格當句子的主詞。`;
+                } else if(type === 'obj') {
+                    qText = `The teacher likes (人稱：${row.person}) ______ very much.`;
+                    correct = row.obj; hint = `賓格放在動詞或介系詞後。`;
+                } else if(type === 'adj') {
+                    qText = `Is that (人稱：${row.person}) ______ magic book?`;
+                    correct = row.adj; hint = `所有格形容詞後面要有名詞。`;
+                } else {
+                    qText = `This wand is (人稱：${row.person}) ______.`;
+                    correct = row.pron; hint = `所有格代名詞 = 所有格形容詞 + 名詞。`;
+                }
+
+                let opts = [correct, "me", "their", "his", "yours"];
+                opts = [...new Set(opts)].filter(o => o !== correct).slice(0, 3);
+                opts.push(correct);
+                opts.sort(() => Math.random() - 0.5);
+
+                questions.push({
+                    q: qText,
+                    opts: opts,
+                    a: opts.indexOf(correct),
+                    hint: hint
+                });
+            }
+        }
+
+        // --- 核心邏輯 ---
+        let currentIndex = 0;
+
+        function renderQuiz() {
+            const wrapper = document.getElementById('quiz-wrapper');
+            const q = questions[currentIndex];
+            const response = userResponses[currentIndex];
+
+            let html = `
+                <div class="quiz-card p-8 md:p-10 rounded-[2.5rem] border animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div class="mb-8">
+                        <span class="inline-block bg-purple-600/50 text-purple-200 px-4 py-1 rounded-full text-xs font-bold mb-4">題目編號 #${currentIndex + 1}</span>
+                        <h3 class="text-2xl md:text-3xl font-medium leading-relaxed">${q.q}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            `;
+
+            q.opts.forEach((opt, idx) => {
+                let statusClass = "";
+                let icon = '<i class="fas fa-magic opacity-0 group-hover:opacity-100 transition-opacity"></i>';
+                
+                if (response !== null) {
+                    if (idx === q.a) {
+                        statusClass = "option-correct";
+                        icon = '<i class="fas fa-check-circle"></i>';
+                    } else if (idx === response.selectedIdx && !response.isCorrect) {
+                        statusClass = "option-wrong";
+                        icon = '<i class="fas fa-times-circle"></i>';
+                    }
+                }
+
+                html += `
+                    <button onclick="handleSelect(${idx}, this)" 
+                            ${response !== null ? 'disabled' : ''}
+                            class="option-btn p-5 rounded-2xl text-left text-lg font-bold flex items-center justify-between group ${statusClass}">
+                        <span>${String.fromCharCode(65 + idx)}. ${opt}</span>
+                        ${icon}
+                    </button>
+                `;
+            });
+
+            html += `</div>`;
+            
+            if (response !== null) {
+                html += `
+                    <div class="mt-8 p-5 bg-white/5 rounded-2xl border border-white/10 flex items-start gap-4 animate-in zoom-in-95">
+                        <div class="text-yellow-400 text-xl pt-1"><i class="fas fa-lightbulb"></i></div>
+                        <div>
+                            <p class="font-bold text-yellow-400">解析筆記：</p>
+                            <p class="text-gray-300">${q.hint}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            wrapper.innerHTML = html;
+
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / 100`;
+            updatePagination();
+            updateStats();
+        }
+
+        function handleSelect(idx, btn) {
+            const q = questions[currentIndex];
+            const isCorrect = (idx === q.a);
+            
+            userResponses[currentIndex] = { selectedIdx: idx, isCorrect: isCorrect };
+            
+            if (isCorrect) {
+                magicSparkle(btn);
+            } else {
+                btn.parentElement.parentElement.classList.add('animate-shake');
+                setTimeout(() => btn.parentElement.parentElement.classList.remove('animate-shake'), 500);
+            }
+
+            renderQuiz();
+            updateMistakeList();
+
+            // 如果正確且還有下一題，自動跳轉
+            if (isCorrect && currentIndex < 99) {
+                setTimeout(() => {
+                    currentIndex++;
+                    renderQuiz();
+                }, 1200);
+            }
+        }
+
+        function updatePagination() {
+            const grid = document.getElementById('pagination-grid');
+            grid.innerHTML = '';
+            
+            questions.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.innerText = i + 1;
+                let classes = "w-10 h-10 rounded-lg text-xs font-bold transition-all border border-white/10 ";
+                
+                const res = userResponses[i];
+                if (res !== null) {
+                    classes += res.isCorrect ? "nav-btn-correct " : "nav-btn-wrong ";
+                } else {
+                    classes += "bg-white/5 hover:bg-white/20 ";
+                }
+
+                if (i === currentIndex) classes += "nav-btn-current ";
+
+                btn.className = classes;
+                btn.onclick = () => {
+                    currentIndex = i;
+                    renderQuiz();
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function updateStats() {
+            const correctCount = userResponses.filter(r => r && r.isCorrect).length;
+            const wrongCount = userResponses.filter(r => r && !r.isCorrect).length;
+            document.getElementById('score').innerText = correctCount * 10;
+            document.getElementById('wrong-count').innerText = wrongCount;
+
+            if (userResponses.filter(r => r !== null).length === 100) {
+                showCelebration(correctCount);
+            }
+        }
+
+        function updateMistakeList() {
+            const list = document.getElementById('mistake-list');
+            const mistakes = userResponses.map((r, i) => r && !r.isCorrect ? i : null).filter(i => i !== null);
+
+            if (mistakes.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 italic">目前沒有錯題，保持下去！</p>';
+                return;
+            }
+
+            list.innerHTML = mistakes.map(idx => `
+                <div class="bg-red-900/20 border border-red-500/20 p-4 rounded-xl flex justify-between items-center group">
+                    <div>
+                        <span class="text-red-400 font-bold mr-2">#${idx + 1}</span>
+                        <span class="text-gray-300">${questions[idx].q.substring(0, 50)}...</span>
+                    </div>
+                    <button onclick="goToQuestion(${idx})" class="text-xs bg-red-500/20 hover:bg-red-500/40 px-3 py-1 rounded-lg transition-all">
+                        查看錯題 <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function goToQuestion(idx) {
+            currentIndex = idx;
+            document.getElementById('mistake-section').classList.add('hidden');
+            renderQuiz();
+            window.scrollTo({ top: document.querySelector('section.relative').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        function toggleMistakeSummary() {
+            const sec = document.getElementById('mistake-section');
+            sec.classList.toggle('hidden');
+            if(!sec.classList.contains('hidden')) {
+                sec.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function magicSparkle(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 20; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                s.style.setProperty('--tx', `${tx}px`);
+                s.style.setProperty('--ty', `${ty}px`);
+                s.style.left = `${rect.left + rect.width / 2}px`;
+                s.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+                s.style.width = Math.random() * 8 + 4 + 'px';
+                s.style.height = s.style.width;
+                s.style.background = `hsl(${Math.random() * 60 + 40}, 100%, 70%)`;
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 800);
+            }
+        }
+
+        function showCelebration(correct) {
+            const modal = document.getElementById('celebration-modal');
+            const stats = document.getElementById('final-stats');
+            stats.innerHTML = `正確率：${correct}% <br> 獲得魔法積分：${correct * 10}`;
+            modal.classList.remove('hidden');
+        }
+
+        function initTable() {
+            const tbody = document.getElementById('pronounTableBody');
+            pronounData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-amber-50/50' : 'bg-white/50';
+                tr.innerHTML = `
+                    <td class="p-2 border border-amber-200 font-bold text-amber-900">${row.person}</td>
+                    <td class="p-2 border border-amber-200">${row.sub}</td>
+                    <td class="p-2 border border-amber-200">${row.obj}</td>
+                    <td class="p-2 border border-amber-200">${row.adj}</td>
+                    <td class="p-2 border border-amber-200">${row.pron}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = () => {
+            initTable();
+            generateQuestions();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

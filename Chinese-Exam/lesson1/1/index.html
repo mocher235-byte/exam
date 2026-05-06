@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名魔法學院 - 字形幻化術</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX Parsing -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-[#f8fafc]">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // 簡易 Lucide 圖示組件，對應原代碼中的圖示名稱
+        const Icon = ({ name, className = "w-5 h-5", ...props }) => {
+            const [svg, setSvg] = React.useState('');
+            
+            React.useEffect(() => {
+                // 使用 lucide-static 的命名規則或直接使用全域 lucide 物件
+                if (window.lucide && window.lucide.icons[name]) {
+                    const iconSvg = window.lucide.icons[name].toSvg({
+                        class: className,
+                        ...props
+                    });
+                    setSvg(iconSvg);
+                }
+            }, [name, className]);
+
+            return <span dangerouslySetInnerHTML={{ __html: svg }} />;
+        };
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('library');
+            const [selectedGroup, setSelectedGroup] = useState('all');
+            const [searchTerm, setSearchTerm] = useState('');
+            const [quizIndex, setQuizIndex] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+            const [score, setScore] = useState(0);
+            const [userAnswers, setUserAnswers] = useState({});
+            const [wrongAnswers, setWrongAnswers] = useState([]);
+            const [studentName, setStudentName] = useState('');
+
+            const groups = [
+                { id: 'all', label: '全部咒語' },
+                { id: 'bi', label: 'ㄅㄧˋ 核心' },
+                { id: 'ban', label: 'ㄅㄢˋ / ㄅㄧㄢˋ 核心' },
+                { id: 'mi', label: 'ㄇㄧˋ 核心' },
+                { id: 'lu', label: 'ㄌㄩˇ 核心' },
+                { id: 'special', label: '異變對體' }
+            ];
+
+            const magicData = [
+                { char: '敝', pinyin: 'ㄅㄧˋ', meaning: '破的、壞的 / 自謙之詞', example: '棄若「敝」屣、敝人', note: '【註解】棄若敝屣：像丟掉破鞋子一樣。比喻毫無留戀地拋棄。', groupId: 'bi' },
+                { char: '敞', pinyin: 'ㄔㄤˇ', meaning: '張開、寬廣', example: '「敞」開、寬「敞」', groupId: 'bi' },
+                { char: '蔽', pinyin: 'ㄅㄧˋ', meaning: '遮掩、掩蓋', example: '遮「蔽」、浮雲「蔽」日', groupId: 'bi' },
+                { char: '幣', pinyin: 'ㄅㄧˋ', meaning: '錢，用來交易的媒介', example: '錢「幣」、銀「幣」', groupId: 'bi' },
+                { char: '弊', pinyin: 'ㄅㄧˋ', meaning: '非法的情事', example: '作「弊」、「弊」端', groupId: 'bi' },
+                { char: '斃', pinyin: 'ㄅㄧˋ', meaning: '指「死亡」', example: '坐以待「斃」、槍「斃」', groupId: 'bi' },
+                { char: '憋', pinyin: 'ㄅㄧㄝ', meaning: '壓抑、強忍著', example: '「憋」尿、「憋」不住', groupId: 'special' },
+                { char: '瞥', pinyin: 'ㄆㄧㄝ', meaning: '眼神一閃，過目很快', example: '驚鴻一「瞥」', groupId: 'special' },
+                { char: '辯', pinyin: 'ㄅㄧㄢˋ', meaning: '爭論是非曲直', example: '爭「辯」、 「辯」論', groupId: 'ban' },
+                { char: '辦', pinyin: 'ㄅㄢˋ', meaning: '創設、經營 / 方法', example: '興「辦」、「辦」法', groupId: 'ban' },
+                { char: '辨', pinyin: 'ㄅㄧㄢˋ', meaning: '分別、判別', example: '分「辨」、明「辨」是非', groupId: 'ban' },
+                { char: '瓣', pinyin: 'ㄅㄢˋ', meaning: '花片', example: '花「瓣」', groupId: 'ban' },
+                { char: '密', pinyin: 'ㄇㄧˋ', meaning: '不應洩露的事情', example: '祕「密」、保「密」', groupId: 'mi' },
+                { char: '蜜', pinyin: 'ㄇㄧˋ', meaning: '採花液釀成 / 甜美的事', example: '蜂「蜜」、甜「蜜」', groupId: 'mi' },
+                { char: '耽', pinyin: 'ㄉㄢ', meaning: '延遲 / 著迷、沉溺', example: '「耽」擱、「耽」溺', groupId: 'special' },
+                { char: '眈', pinyin: 'ㄉㄢ', meaning: '雙眼直視、瞪視', example: '虎視「眈眈」', groupId: 'special' },
+                { char: '履', pinyin: 'ㄌㄩˇ', meaning: '鞋子 / 實行某件事', example: '西裝革「履」、履行', groupId: 'lu' },
+                { char: '縷', pinyin: 'ㄌㄩˇ', meaning: '衣服破舊樣子 / 線', example: '篳路藍「縷」、金「縷」衣', groupId: 'lu' },
+                { char: '屢', pinyin: 'ㄌㄩˇ', meaning: '常常、每每', example: '「屢」次、屢試不爽', groupId: 'lu' },
+                { char: '漬', pinyin: 'ㄗˋ', meaning: '汙點 / 浸泡', example: '油「漬」、醃「漬」', groupId: 'special' },
+                { char: '嘖', pinyin: 'ㄗㄜˊ', meaning: '發出讚美的聲音', example: '「嘖嘖」稱奇', groupId: 'special' },
+            ];
+
+            const quizData = [
+                { story: "大法師的禮服派對即將開始，他想形容一雙鞋子很考究，應使用：", q: "大法師想要形容一雙鞋子很考究，應使用：", options: ["西裝革『縷』", "西裝革『履』", "西裝革『屢』", "西裝革『律』"], correct: 1, hint: "提示：『履』(ㄌㄩˇ) 指鞋子，下方為『复』(腳步)。" },
+                { story: "在魔法契約的判定中，需要『明辨是非』。請問『辨』字的中間是什麼？", q: "『明辨是非』的『辨』字，中間的部分是？", options: ["言 (爭論)", "力 (辦事)", "刀 (分別)", "瓜 (瓜瓣)"], correct: 2, hint: "提示：辨(ㄅㄧㄢˋ)別需要用『刀』切分開來。" },
+                { story: "學院的貓頭鷹信差飛過窗前，你只看到一眼，這稱為：", q: "貓頭鷹飛過，只看到一眼稱為？", options: ["驚鴻一『憋』", "驚鴻一『別』", "驚鴻一『撇』", "驚鴻一『瞥』"], correct: 3, hint: "提示：瞥(ㄆㄧㄝ)上有『目』，代表眼睛看。" },
+                { story: "魔法金庫發生了遺失事件，長老提醒大家注意：", q: "關於『幣』與『弊』的用法，何者正確？", options: ["金『幣』輝煌", "作『弊』端", "錢『幣』", "『弊』重就輕"], correct: 2, hint: "提示：幣(ㄅㄧˋ) 與錢財相關；弊則指非法情事。" },
+                { story: "這是一封標記為『祕密』的魔法信件，請問『密』字下方是？", q: "『祕密』的『密』字下方是什麼？", options: ["山 (ㄇㄧˋ)", "蟲 (ㄇㄧˋ)", "示 (ㄒㄧˋ)", "口 (ㄎㄡˇ)"], correct: 0, hint: "提示：密(ㄇㄧˋ) 下方是『山』，指深山中不為人知。" },
+                { story: "創業維艱。在魔法史中，前輩開拓森林時被形容為：", q: "『篳路藍縷』的『縷』代表？", options: ["屢次", "鞋子", "破衣/線", "辦理"], correct: 2, hint: "提示：縷(ㄌㄩˇ) 是系部，指衣服的線條或布料。" },
+                { story: "巨龍在遠處雙眼直視，等待進攻時機，這動作是：", q: "『虎視眈眈』的『眈』讀音為？", options: ["ㄉㄢ", "ㄉㄢˇ", "ㄕㄣˇ", "ㄉㄢˋ"], correct: 0, hint: "提示：眈(ㄉㄢ) 與眼相關，雙眼注視之意。注意不要與『審』(ㄕㄣˇ) 搞混。" },
+                { story: "大法師在審判室想要『分辨是非』，應填入哪個字？", q: "大法師想要『分(  )是非』應填入？", options: ["瓣", "辦", "辨", "辯"], correct: 2, hint: "提示：辨別、判斷應用『辨』。" },
+                { story: "天色昏暗，就像浮雲擋住了太陽，這景象是：", q: "『浮雲(  )日』應用哪個字？", options: ["幣", "弊", "蔽", "敝"], correct: 2, hint: "提示：蔽(ㄅㄧˋ) 指遮掩、掩蓋。" },
+                { story: "對於毫無留戀的舊魔杖，法師會：", q: "對於無留戀的事物『棄若(  )屣』：", options: ["幣", "弊", "蔽", "敝"], correct: 3, hint: "提示：敝(ㄅㄧˋ) 指破舊。敝屣即破草鞋。" }
+            ];
+
+            const filteredData = magicData.filter(d => {
+                const matchesSearch = d.char.includes(searchTerm) || d.meaning.includes(searchTerm) || d.example.includes(searchTerm);
+                const matchesGroup = selectedGroup === 'all' || d.groupId === selectedGroup;
+                return matchesSearch && matchesGroup;
+            });
+
+            const handleSelectOption = (optionIdx) => {
+                setUserAnswers(prev => ({ ...prev, [quizIndex]: optionIdx }));
+                if (quizIndex < quizData.length - 1) {
+                    setTimeout(() => setQuizIndex(quizIndex + 1), 500);
+                }
+            };
+
+            const calculateResults = () => {
+                let finalScore = 0;
+                const finalWrongs = [];
+                quizData.forEach((q, idx) => {
+                    if (userAnswers[idx] === q.correct) {
+                        finalScore += 10;
+                    } else {
+                        finalWrongs.push({
+                            id: idx + 1,
+                            question: q.q,
+                            yourAnswer: userAnswers[idx] !== undefined ? q.options[userAnswers[idx]] : "未冥想",
+                            correctAnswer: q.options[q.correct],
+                            hint: q.hint
+                        });
+                    }
+                });
+                setScore(finalScore);
+                setWrongAnswers(finalWrongs);
+                setShowResult(true);
+            };
+
+            const resetQuiz = () => {
+                setQuizIndex(0);
+                setShowResult(false);
+                setScore(0);
+                setUserAnswers({});
+                setWrongAnswers([]);
+            };
+
+            const handlePrint = () => { window.print(); };
+
+            const navigateToNextLesson = () => {
+                window.open('../2/index.html', '_blank');
+            };
+
+            return (
+                <div className="min-h-screen">
+                    {/* 列印視圖內容 */}
+                    <div className="print-only p-10 text-black bg-white">
+                        <div className="text-center mb-10 border-b-2 border-black pb-4">
+                            <h1 className="text-3xl font-bold mb-2">金名魔法學院 - 字形幻化術錯題本</h1>
+                            <div className="flex justify-between items-center text-lg mt-4 px-10">
+                                <p><strong>法師姓名：</strong> {studentName || '見習法師'}</p>
+                                <p><strong>修煉得分：</strong> {score} 分</p>
+                                <p><strong>列印日期：</strong> {new Date().toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <h2 className="text-xl font-bold mb-6">【 錯題修行清單 】</h2>
+                        {wrongAnswers.length > 0 ? (
+                            wrongAnswers.map((item, i) => (
+                                <div key={i} className="border border-gray-300 p-5 mb-5 rounded-lg">
+                                    <p className="font-bold text-lg mb-2">第 {item.id} 題：{item.question}</p>
+                                    <div className="grid grid-cols-2 gap-4 mb-2">
+                                        <p>✘ 你的選擇：<span className="line-through">{item.yourAnswer}</span></p>
+                                        <p>✔ 正確咒語：<strong>{item.correctAnswer}</strong></p>
+                                    </div>
+                                    <p className="text-sm border-t pt-2 mt-2"><strong>奧義提示：</strong>{item.hint}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-center text-xl mt-20">恭喜！全數通過，無須修行錯題。</p>
+                        )}
+                        <div className="mt-20 text-center border-t pt-10 text-gray-400 text-sm italic">
+                            金名魔法學院 ‧ 國語科教研組 監製
+                        </div>
+                    </div>
+
+                    <div className="no-print">
+                        <header className="bg-gradient-to-b from-[#1e1b4b] to-[#0f172a] border-b border-[#d4af37]/30 py-10 px-4 text-center relative">
+                            <div className="inline-flex items-center gap-3 px-6 py-2 bg-[#d4af37]/10 rounded-full border border-[#d4af37]/50 mb-4">
+                                <Icon name="wand-2" className="w-5 h-5 text-[#d4af37]" />
+                                <span className="text-[#d4af37] font-bold tracking-widest text-sm uppercase">金名魔法學院特訓班</span>
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#d4af37] via-[#fef3c7] to-[#d4af37] drop-shadow-2xl">
+                                字形幻化術：魔法奧義辨正
+                            </h1>
+                        </header>
+
+                        <main className="max-w-6xl mx-auto px-4 py-8 pb-40">
+                            <div className="flex flex-wrap justify-center gap-3 mb-10">
+                                {[
+                                    { id: 'library', label: '魔法圖書館', icon: 'book' },
+                                    { id: 'strategy', label: '咒語結構解析', icon: 'zap' },
+                                    { id: 'quiz', label: '100分試煉場', icon: 'skull' },
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${
+                                            activeTab === tab.id 
+                                            ? 'bg-[#d4af37] text-indigo-950 scale-105 shadow-lg' 
+                                            : 'bg-indigo-900/30 text-slate-300 hover:bg-indigo-900/50 border border-indigo-800'
+                                        }`}
+                                    >
+                                        <Icon name={tab.icon} />
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {activeTab === 'library' && (
+                                <div className="space-y-6">
+                                    <div className="flex flex-wrap gap-2 justify-center pb-6 border-b border-indigo-900/50">
+                                        {groups.map(g => (
+                                            <button
+                                                key={g.id}
+                                                onClick={() => setSelectedGroup(g.id)}
+                                                className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+                                                    selectedGroup === g.id 
+                                                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' 
+                                                    : 'bg-indigo-950/50 border-indigo-800 text-slate-400 hover:border-[#d4af37]/50'
+                                                }`}
+                                            >
+                                                {g.label}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
+                                        {filteredData.map((item, idx) => (
+                                            <div key={idx} className="bg-indigo-950/40 border border-indigo-800/50 rounded-2xl p-5 hover:border-[#d4af37]/50 group transition-all backdrop-blur-sm">
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <span className="text-4xl font-black text-[#d4af37] drop-shadow-lg">{item.char}</span>
+                                                    <span className="bg-indigo-900 px-3 py-1 rounded-lg text-indigo-300 font-bold text-sm">{item.pinyin}</span>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <p className="text-slate-300 text-sm font-medium leading-relaxed border-l-2 border-[#d4af37]/50 pl-3">
+                                                        {item.meaning}
+                                                    </p>
+                                                    <div className="bg-[#d4af37]/5 p-3 rounded-xl border border-[#d4af37]/20">
+                                                        <span className="text-[10px] text-[#d4af37] font-black uppercase block mb-1">奧義實例</span>
+                                                        <p className="text-[#fef3c7] font-bold text-sm mb-1">{item.example}</p>
+                                                        {item.note && (
+                                                            <p className="text-indigo-200 text-[11px] font-medium italic mt-2 border-t border-[#d4af37]/20 pt-2 leading-relaxed">
+                                                                {item.note}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'strategy' && (
+                                <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+                                    <div className="bg-[#fef3c7] text-indigo-950 p-8 rounded-[40px] shadow-2xl relative border-4 border-[#d4af37]/30">
+                                        <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
+                                            <Icon name="star" className="text-[#d4af37] fill-[#d4af37] w-6 h-6" /> 字形幻化術：結構奧義
+                                        </h3>
+                                        <ul className="space-y-8">
+                                            <li className="space-y-4">
+                                                <div className="flex items-start gap-3 font-black text-xl text-indigo-800">
+                                                    <div className="w-9 h-9 rounded-full bg-indigo-950 text-[#fef3c7] flex items-center justify-center text-sm shadow-lg shrink-0">1</div>
+                                                    <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+                                                        <span className="whitespace-nowrap">辯(ㄅㄧㄢˋ)</span>、
+                                                        <span className="whitespace-nowrap">辦(ㄅㄢˋ)</span>、
+                                                        <span className="whitespace-nowrap">辨(ㄅㄧㄢˋ)</span>、
+                                                        <span className="whitespace-nowrap">瓣(ㄅㄢˋ)</span>
+                                                        <span className="text-sm font-medium opacity-60 ml-2">(幻化規則)</span>
+                                                    </div>
+                                                </div>
+                                                <div className="pl-12 space-y-4">
+                                                    {[
+                                                        { part: '言', sound: 'ㄧㄢˊ', desc: '爭辯需口「言」', target: '辯論、爭辯' },
+                                                        { part: '力', sound: 'ㄌㄧˋ', desc: '辦事需出「力」', target: '辦事、創辦' },
+                                                        { part: '刀', sound: 'ㄉㄠ', desc: '辨別需切分「刀」', target: '辨別、判別' },
+                                                        { part: '瓜', sound: 'ㄍㄨㄚ', desc: '花瓣如「瓜」片', target: '花瓣' },
+                                                    ].map((item, i) => (
+                                                        <div key={i} className="bg-white/50 p-4 rounded-2xl border border-indigo-200">
+                                                            <p className="text-sm font-bold text-indigo-950 leading-relaxed">
+                                                                <span className="whitespace-nowrap">「{item.part}」(<span className="text-indigo-600 italic">{item.sound}</span>)</span>：{item.desc}，故為 <span className="text-indigo-900 underline decoration-indigo-300 underline-offset-4 font-black">{item.target}</span>。
+                                                            </p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className="space-y-6">
+                                        <div className="bg-indigo-900/40 border-2 border-[#d4af37]/30 p-8 rounded-[40px] flex flex-col backdrop-blur-sm shadow-xl">
+                                            <h3 className="text-2xl font-black mb-6 text-[#d4af37] flex items-center gap-2"><Icon name="sparkles" /> 幻化高分筆記</h3>
+                                            <div className="space-y-4 flex-1">
+                                                <div className="p-5 bg-indigo-950/80 rounded-2xl border border-indigo-700">
+                                                    <h4 className="font-bold text-[#fef3c7] mb-2 flex items-center gap-2"><Icon name="book-open-check" className="w-4 h-4" /> 結構記憶：敝</h4>
+                                                    <p className="text-slate-300 text-sm leading-relaxed">
+                                                        「敝」本意破舊。成語「棄若敝屣」中的「敝屣」即指破鞋，形容毫不在意地丟棄。
+                                                    </p>
+                                                </div>
+                                                <div className="p-5 bg-indigo-950/80 rounded-2xl border border-indigo-700">
+                                                    <h4 className="font-bold text-[#fef3c7] mb-2 flex items-center gap-2"><Icon name="layout-grid" className="w-4 h-4" /> 元素聯想</h4>
+                                                    <p className="text-slate-300 text-sm leading-loose">
+                                                        目 {'→'} 瞥 (眼神瞬閃)<br/>
+                                                        系 {'→'} 縷 (絲線纖維)<br/>
+                                                        山 {'→'} 密 (隱密幽深)
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'quiz' && (
+                                <div className="max-w-4xl mx-auto">
+                                    {!showResult ? (
+                                        <div className="bg-indigo-950/60 border border-[#d4af37]/40 p-8 rounded-[40px] backdrop-blur-xl shadow-2xl">
+                                            <div className="flex flex-wrap justify-between gap-3 mb-10 pb-4 border-b border-indigo-900/50">
+                                                {quizData.map((_, i) => (
+                                                    <button 
+                                                        key={i} 
+                                                        onClick={() => setQuizIndex(i)}
+                                                        className={`w-12 h-12 flex items-center justify-center rounded-2xl font-black text-sm transition-all transform hover:scale-110 ${
+                                                            i === quizIndex 
+                                                                ? 'bg-[#d4af37] text-indigo-950 shadow-[0_0_20px_rgba(212,175,55,0.4)]' 
+                                                                : userAnswers[i] !== undefined 
+                                                                    ? 'bg-indigo-600 text-white border-2 border-indigo-400' 
+                                                                    : 'bg-indigo-900/40 text-indigo-700 border border-indigo-800'
+                                                        }`}
+                                                    >
+                                                        {i + 1}
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            <div className="flex justify-between items-center mb-8">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-[#d4af37]/20 rounded-xl"><Icon name="sword" className="text-[#d4af37]" /></div>
+                                                    <span className="text-[#d4af37] font-black text-sm tracking-widest uppercase">試煉挑戰：第 {quizIndex + 1} 關</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-indigo-900/30 p-6 rounded-3xl border border-indigo-800 mb-8 italic text-indigo-200 text-lg leading-relaxed font-medium">
+                                                「{quizData[quizIndex].story}」
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {quizData[quizIndex].options.map((opt, idx) => {
+                                                    const isSelected = userAnswers[quizIndex] === idx;
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            onClick={() => handleSelectOption(idx)}
+                                                            className={`w-full text-left p-6 rounded-3xl font-bold border-2 transition-all flex items-center justify-between group ${
+                                                                isSelected 
+                                                                    ? 'bg-[#d4af37]/20 border-[#d4af37] text-[#d4af37]' 
+                                                                    : 'bg-indigo-950/40 border-indigo-800 hover:border-indigo-600 text-slate-400'
+                                                            }`}
+                                                        >
+                                                            <span className="flex items-center gap-3">
+                                                                <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs ${isSelected ? 'bg-[#d4af37] border-transparent text-indigo-950' : 'border-indigo-700 text-indigo-700'}`}>
+                                                                    {String.fromCharCode(65 + idx)}
+                                                                </div>
+                                                                {opt}
+                                                            </span>
+                                                            {isSelected && <Icon name="check-circle" className="w-5 h-5" />}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            <div className="mt-12 flex justify-between items-center pt-8 border-t border-indigo-900/50">
+                                                <button disabled={quizIndex === 0} onClick={() => setQuizIndex(quizIndex - 1)} className="flex items-center gap-2 text-indigo-400 font-black disabled:opacity-20 transition-all">
+                                                    <Icon name="chevron-left" /> 回溯上一關
+                                                </button>
+                                                {Object.keys(userAnswers).length === quizData.length && (
+                                                    <button onClick={calculateResults} className="bg-gradient-to-r from-[#d4af37] to-[#fef3c7] text-indigo-950 px-12 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition-all animate-bounce">提交試煉奧義</button>
+                                                )}
+                                                <button disabled={quizIndex === quizData.length - 1} onClick={() => setQuizIndex(quizIndex + 1)} className="flex items-center gap-2 text-indigo-400 font-black disabled:opacity-20 transition-all">
+                                                    前往下一關 <Icon name="chevron-right" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-8 pb-20">
+                                            <div className="text-center bg-gradient-to-b from-indigo-900/40 to-indigo-950/60 p-12 rounded-[50px] border border-[#d4af37]/30 shadow-2xl">
+                                                <div className="text-8xl font-black text-white mb-2">{score} <span className="text-2xl text-[#d4af37]">分</span></div>
+                                                <div className="text-3xl font-black text-[#fef3c7] mb-8">{score === 100 ? "大魔導師：完美幻化！" : "試煉結束，準備修行"}</div>
+                                                
+                                                <div className="max-w-xs mx-auto mb-8">
+                                                    <label className="block text-[#d4af37] text-sm font-bold mb-2 text-left ml-2">法師姓名 (將列印於錯題本)</label>
+                                                    <div className="relative">
+                                                        <div className="absolute left-4 top-1/2 -translate-y-1/2"><Icon name="user" className="w-4 h-4 text-slate-500" /></div>
+                                                        <input 
+                                                            type="text" 
+                                                            value={studentName}
+                                                            onChange={(e) => setStudentName(e.target.value)}
+                                                            placeholder="輸入你的姓名..."
+                                                            className="w-full bg-indigo-950 border border-indigo-800 rounded-xl py-3 pl-12 pr-4 focus:border-[#d4af37] outline-none text-white font-bold"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-wrap gap-4 justify-center">
+                                                    <button onClick={handlePrint} className="flex items-center gap-2 bg-white text-indigo-950 px-8 py-4 rounded-2xl font-black hover:scale-105 transition-all shadow-xl">
+                                                        <Icon name="printer" /> 列印錯題修行本
+                                                    </button>
+                                                    <button onClick={resetQuiz} className="flex items-center gap-2 bg-indigo-900 text-white px-8 py-4 rounded-2xl font-black hover:scale-105 transition-all border border-indigo-700">
+                                                        <Icon name="rotate-ccw" /> 重啟修煉
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-indigo-950/40 border border-indigo-800 rounded-[40px] p-10">
+                                                <h3 className="text-2xl font-black text-[#d4af37] mb-8 flex items-center gap-3">
+                                                    <Icon name="layout-grid" className="w-7 h-7" /> 試煉錯題 analysis 與強化
+                                                </h3>
+                                                {wrongAnswers.length === 0 ? (
+                                                    <div className="py-20 text-center bg-emerald-500/10 rounded-3xl border border-emerald-500/20">
+                                                        <p className="text-emerald-300 font-black text-xl">全數通過！你的幻化咒語無懈可擊。</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-6">
+                                                        {wrongAnswers.map((item, i) => (
+                                                            <div key={i} className="bg-indigo-900/20 p-8 rounded-3xl border border-indigo-800">
+                                                                <p className="font-black text-[#fef3c7] mb-6 text-xl">第 {item.id} 題：「{item.question}」</p>
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                                                    <div className="bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20">
+                                                                        <span className="text-[10px] text-rose-400 font-black block mb-1">你的選擇</span>
+                                                                        <span className="text-rose-200 font-bold opacity-70 line-through">{item.yourAnswer}</span>
+                                                                    </div>
+                                                                    <div className="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">
+                                                                        <span className="text-[10px] text-emerald-400 font-black block mb-1">正確奧義</span>
+                                                                        <span className="text-emerald-100 font-black">{item.correctAnswer}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="bg-[#d4af37]/5 p-5 rounded-2xl border border-[#d4af37]/20 flex gap-4 text-sm text-[#d4af37] font-bold">
+                                                                    <Icon name="alert-circle" className="w-6 h-6 shrink-0" />
+                                                                    <p className="leading-relaxed">{item.hint}</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </main>
+
+                        <footer className="fixed bottom-0 left-0 right-0 bg-indigo-950/95 backdrop-blur-lg border-t border-[#d4af37]/20 p-5 z-50">
+                            <div className="max-w-5xl mx-auto flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2.5 bg-[#d4af37]/20 rounded-xl animate-pulse">
+                                        <Icon name="graduation-cap" className="text-[#d4af37] w-6 h-6" />
+                                    </div>
+                                    <div className="hidden md:block">
+                                        <p className="text-[10px] font-black text-[#d4af37] uppercase tracking-widest leading-none mb-1.5">金名魔法學院特訓</p>
+                                        <div className="flex gap-1.5">
+                                            <div className={`w-4 h-1.5 rounded-full transition-all ${activeTab === 'library' ? 'bg-[#d4af37] w-8' : 'bg-indigo-800'}`}></div>
+                                            <div className={`w-4 h-1.5 rounded-full transition-all ${activeTab === 'strategy' ? 'bg-[#d4af37] w-8' : 'bg-indigo-800'}`}></div>
+                                            <div className={`w-4 h-1.5 rounded-full transition-all ${activeTab === 'quiz' ? 'bg-[#d4af37] w-8' : 'bg-indigo-800'}`}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-8">
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-tighter mb-0.5">累計修煉能量</p>
+                                        <p className="text-2xl font-black text-[#d4af37] leading-none">{score}</p>
+                                    </div>
+                                    <div className="w-px h-10 bg-indigo-800 mx-2"></div>
+                                    <button 
+                                        onClick={navigateToNextLesson}
+                                        className="flex items-center gap-3 bg-gradient-to-r from-indigo-800 to-indigo-900 px-6 py-3 rounded-2xl text-xs font-black text-[#d4af37] hover:from-[#d4af37] hover:to-[#fef3c7] hover:text-indigo-950 transition-all border border-[#d4af37]/30 shadow-lg group"
+                                    >
+                                        探索下一秘境 <Icon name="chevron-right" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

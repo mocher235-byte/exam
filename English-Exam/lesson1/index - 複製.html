@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1 | 金名升私中特訓班</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .magic-font {
+            font-family: 'Nova Script', cursive;
+        }
+
+        .lesson-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .lesson-card:hover {
+            transform: scale(1.02) translateY(-10px);
+            border-color: #fbbf24;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(251, 191, 36, 0.1);
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <!-- 返回總目錄 -->
+    <nav class="max-w-6xl mx-auto mb-8">
+        <a href="../index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> 返回總目錄
+        </a>
+    </nav>
+
+    <header class="text-center mb-16">
+        <h1 class="text-5xl md:text-7xl font-bold magic-font text-yellow-400 mb-4 drop-shadow-[0_0_15px_rgba(236,201,75,0.5)]">
+            Lesson One
+        </h1>
+        <p class="text-2xl md:text-3xl font-bold tracking-widest text-purple-200">人稱代名詞與所有格：魔法啟程</p>
+        <div class="mt-4 h-1 w-24 bg-yellow-400 mx-auto rounded-full"></div>
+    </header>
+
+    <main class="max-w-5xl mx-auto">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- 第一階段 -->
+            <a href="1/index.html" class="lesson-card p-8 rounded-3xl relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <div class="flex items-start justify-between mb-6">
+                    <span class="step-number font-black text-3xl magic-font">Part 01</span>
+                    <i class="fas fa-book-open text-yellow-400 text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-3 text-white">基礎概念特訓</h2>
+                <p class="text-gray-400 leading-relaxed">
+                    學習人稱代名詞的四種形態：主格、賓格、所有格形容詞與所有格代名詞，並進行基礎魔法挑戰。
+                </p>
+            </a>
+
+            <!-- 第二階段 -->
+            <a href="2/index.html" class="lesson-card p-8 rounded-3xl relative overflow-hidden group border-purple-500/30">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform text-purple-400">
+                    <i class="fas fa-wand-sparkles"></i>
+                </div>
+                <div class="flex items-start justify-between mb-6">
+                    <span class="step-number font-black text-3xl magic-font">Part 02</span>
+                    <i class="fas fa-sort-numeric-down text-purple-400 text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-3 text-white">用法與排列禁忌</h2>
+                <p class="text-gray-400 leading-relaxed">
+                    掌握 It's vs Its 的陷阱，以及人稱並列時的魔法順序：單數 (2→3→1) 與複數 (1→2→3)。
+                </p>
+            </a>
+
+            <!-- 第三階段 -->
+            <a href="3/index.html" class="lesson-card p-8 rounded-3xl relative overflow-hidden group border-amber-500/30">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform text-amber-400">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div class="flex items-start justify-between mb-6">
+                    <span class="step-number font-black text-3xl magic-font">Part 03</span>
+                    <i class="fas fa-users-rays text-amber-400 text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-3 text-white">所有權進階秘籍</h2>
+                <p class="text-gray-400 leading-relaxed">
+                    解鎖「個別所有」與「共同所有」的差異，並學會「冠詞、所有格、指示形容詞」的三選一禁令。
+                </p>
+            </a>
+
+            <!-- 第四階段 -->
+            <a href="4/index.html" class="lesson-card p-8 rounded-3xl relative overflow-hidden group border-red-500/30">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl group-hover:scale-110 transition-transform text-red-400">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="flex items-start justify-between mb-6">
+                    <span class="step-number font-black text-3xl magic-font">Part 04</span>
+                    <i class="fas fa-fire-alt text-red-400 text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-3 text-white">100 題大考驗</h2>
+                <p class="text-gray-400 leading-relaxed">
+                    終極試煉場！挑戰 100 道隨機生成的代名詞與所有格題目，測試你是否具備大法師的資格。
+                </p>
+            </a>
+
+        </div>
+
+    </main>
+
+    <footer class="mt-24 text-center text-gray-500 text-sm border-t border-white/10 pt-8">
+        <p>© 2026 金名文理補習班 | 升私中英文特訓系列課程</p>
+    </footer>
+
+</body>
+</html>

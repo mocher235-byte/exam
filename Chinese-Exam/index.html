@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升私中特訓班 - 國語科</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // 由於在瀏覽器端無法直接 import lucide-react，我們改用 SVG 函數組件或 Lucide 的全局變量
+        // 這裡定義一個簡單的圖標組件封裝
+        const Icon = ({ name, className = "h-5 w-5" }) => {
+            const icons = {
+                Target: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+                Search: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+                Layout: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>,
+                Zap: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 14.71 13 3l-2.43 8.18H20L11 21l2.43-8.18H4z"/></svg>,
+                Globe: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
+                Award: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>,
+                ChevronRight: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
+                CheckCircle: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+            };
+            return icons[name] || null;
+        };
+
+        const { useState, useEffect } = React;
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('all');
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const courseData = [
+                {
+                    id: 1,
+                    category: '基礎字詞',
+                    title: '字音字形深度辨正',
+                    status: '核心',
+                    description: '針對小升初常見易讀錯、易寫錯的形音義進行系統化解析，建立紮實的文字功底。',
+                    tags: ['破音字', '形似字', '同音字']
+                },
+                {
+                    id: 2,
+                    category: '詞語應用',
+                    title: '高頻成語應用與辨析',
+                    status: '必考',
+                    description: '歸納歷屆私中考試核心成語，涵蓋人物描寫、情境運用與反義近義詞深度辨析。',
+                    tags: ['情境運用', '出處典故', '成語填空']
+                },
+                {
+                    id: 3,
+                    category: '語文常識',
+                    title: '精準修辭技巧大全',
+                    status: '重要',
+                    description: '解析譬喻、擬人、誇張等常用修辭格，透過實例訓練學生在閱讀與寫作中的識別能力。',
+                    tags: ['修辭判斷', '寫作應用', '技巧解析']
+                },
+                {
+                    id: 4,
+                    category: '國學常識',
+                    title: '文學常識與文化脈絡',
+                    status: '進階',
+                    description: '系統化梳理各代文學體裁（詩詞曲）、年齡稱謂、對聯及季節判定的關鍵考點。',
+                    tags: ['近體詩', '文化常識', '節令對聯']
+                },
+                {
+                    id: 5,
+                    category: '應用文',
+                    title: '生活應用文格式規範',
+                    status: '實務',
+                    description: '掌握書信、便條與柬帖的標準格式，包含精確的稱謂語、提稱語及祝候語運用。',
+                    tags: ['書信格式', '社交禮儀', '柬帖識別']
+                },
+                {
+                    id: 6,
+                    category: '閱讀理解',
+                    title: '白話與文言跨域閱讀',
+                    status: '關鍵',
+                    description: '精選模擬考與歷屆高頻題型，訓練學生精準擷取關鍵資訊與判讀文章主旨。',
+                    tags: ['主旨判斷', '細節分析', '文言判讀']
+                }
+            ];
+
+            const categories = ['全部', '基礎字詞', '詞語應用', '語文常識', '國學常識', '應用文', '閱讀理解'];
+
+            const filteredData = courseData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                     item.description.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesTab = activeTab === 'all' || (activeTab === '全部' ? true : item.category === activeTab);
+                return matchesSearch && matchesTab;
+            });
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-12">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg sticky top-0 z-50">
+                        <div className="max-w-6xl mx-auto px-4 py-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+                                        <Icon name="Target" className="text-yellow-400 h-8 w-8" />
+                                        金名升私中特訓班 - 國語科
+                                    </h1>
+                                    <p className="mt-2 text-blue-100 flex items-center gap-2">
+                                        <Icon name="Layout" className="h-4 w-4" /> 內部教學系統 · 課程總目錄
+                                    </p>
+                                </div>
+                                <div className="relative">
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300">
+                                        <Icon name="Search" />
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="搜尋教學單元..." 
+                                        className="pl-10 pr-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-blue-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full md:w-64 backdrop-blur-sm"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Hero Section */}
+                    <div className="bg-white border-b">
+                        <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100 shadow-sm flex items-start gap-4">
+                                <div className="bg-blue-600 rounded-lg p-3 text-white">
+                                    <Icon name="Zap" className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg text-blue-900">核心基礎課程</h3>
+                                    <p className="text-sm text-blue-700 mt-1">針對升學必備基本功進行系統化編排與強化。</p>
+                                </div>
+                            </div>
+                            <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100 shadow-sm flex items-start gap-4">
+                                <div className="bg-amber-600 rounded-lg p-3 text-white">
+                                    <Icon name="Globe" className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg text-amber-900">深度進階專題</h3>
+                                    <p className="text-sm text-amber-700 mt-1">涵蓋高階成語、國學常識與應用文實務。</p>
+                                </div>
+                            </div>
+                            <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 shadow-sm flex items-start gap-4">
+                                <div className="bg-emerald-600 rounded-lg p-3 text-white">
+                                    <Icon name="Award" className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg text-emerald-900">仿真模擬評測</h3>
+                                    <p className="text-sm text-emerald-700 mt-1">收錄歷年私中熱門題型，提升臨場作答力。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <main className="max-w-6xl mx-auto px-4 mt-8">
+                        {/* Category Tabs */}
+                        <div className="flex overflow-x-auto pb-4 gap-2 scrollbar-hide">
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveTab(cat === '全部' ? 'all' : cat)}
+                                    className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                                        (activeTab === 'all' && cat === '全部') || activeTab === cat
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Course List Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                            {filteredData.length > 0 ? (
+                                filteredData.map((course) => (
+                                    <div key={course.id} className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+                                        <div className="p-6">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                                    {course.category}
+                                                </span>
+                                                <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                                                    course.status === '必考' ? 'bg-red-100 text-red-600' : 
+                                                    course.status === '關鍵' ? 'bg-purple-100 text-purple-600' :
+                                                    'bg-slate-100 text-slate-600'
+                                                }`}>
+                                                    {course.status}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                                {course.title}
+                                            </h3>
+                                            <p className="mt-4 text-slate-600 text-sm leading-relaxed">
+                                                {course.description}
+                                            </p>
+                                            <div className="mt-6 flex flex-wrap gap-2">
+                                                {course.tags.map(tag => (
+                                                    <span key={tag} className="text-[11px] font-semibold bg-slate-50 text-slate-500 px-2 py-1 rounded border border-slate-100">
+                                                        #{tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="mt-auto border-t border-slate-50 bg-slate-50/50 p-4 flex items-center justify-end">
+                                            <button className="flex items-center gap-1 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors group/btn">
+                                                開始學習
+                                                <Icon name="ChevronRight" className="h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+                                    <div className="flex justify-center mb-4">
+                                        <Icon name="Search" className="h-12 w-12 text-slate-300" />
+                                    </div>
+                                    <p className="text-slate-500">找不到相符的教學單元。</p>
+                                    <button 
+                                        onClick={() => {setSearchTerm(''); setActiveTab('all');}}
+                                        className="mt-4 text-blue-600 font-bold hover:underline"
+                                    >
+                                        清除所有搜尋與篩選
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Bottom Banner */}
+                        <div className="mt-12 bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
+                            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+                                <div>
+                                    <h2 className="text-2xl md:text-3xl font-extrabold mb-2 italic">私中特訓 · 實力登頂</h2>
+                                    <p className="text-indigo-200 max-w-lg">
+                                        金名升私中團隊獨家研發教學系統，整合多元教學資源，專為頂尖學生量身打造的國語科特訓課程。
+                                    </p>
+                                    <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
+                                            <span className="text-sm font-medium">系統化觀念梳理</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
+                                            <span className="text-sm font-medium">個人化錯題追蹤</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Icon name="CheckCircle" className="h-5 w-5 text-emerald-400" />
+                                            <span className="text-sm font-medium">考場作答技巧</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-3 min-w-[200px]">
+                                    <button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-xl shadow-lg transition-transform hover:-translate-y-1 active:translate-y-0 text-center">
+                                        進入學習系統
+                                    </button>
+                                    <button className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-xl transition-colors text-center backdrop-blur-sm border border-white/20">
+                                        下載學習進度表
+                                    </button>
+                                </div>
+                            </div>
+                            {/* Background effects */}
+                            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+                            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="mt-12 py-10 border-t border-slate-200 text-center text-slate-400">
+                        <div className="max-w-6xl mx-auto px-4">
+                            <p className="text-sm font-semibold mb-2">© 2026 金名升私中特訓班 · 國語科</p>
+                            <p className="text-xs max-w-md mx-auto leading-relaxed">
+                                本系統所載之教學大綱與內容架構均為金名升私中特訓班版權所有。未經授權，請勿翻印、轉載或用於其他商業用途。
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升魔法學院 - 人稱代名詞特訓</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        :root {
+            --magic-purple: #6b46c1;
+            --magic-gold: #ecc94b;
+            --scroll-bg: #fdf5e6;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .magic-font {
+            font-family: 'Nova Script', cursive;
+        }
+
+        /* 捲軸樣式 */
+        .scroll-container {
+            background: var(--scroll-bg);
+            color: #4a3728;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 100px rgba(139, 69, 19, 0.2);
+            border: 8px solid #8b4513;
+            position: relative;
+        }
+
+        .scroll-container::before, .scroll-container::after {
+            content: '';
+            position: absolute;
+            height: 110%;
+            width: 35px;
+            background: #5d2906;
+            top: -5%;
+            border-radius: 20px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .scroll-container::before { left: -25px; }
+        .scroll-container::after { right: -25px; }
+
+        .magic-table th {
+            background-color: #8b4513;
+            color: #fff;
+        }
+
+        .magic-table td {
+            border-bottom: 1px solid #d2b48c;
+        }
+
+        /* 特殊咒語標籤 */
+        .spell-tag {
+            background: linear-gradient(to right, #6b46c1, #805ad5);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .order-box {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px dashed #8b4513;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: white;
+            border-radius: 50%;
+            animation: sparkleAnim 0.8s linear forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        .quiz-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 頂部標題區 -->
+    <header class="text-center mb-12">
+        <h1 class="text-5xl md:text-7xl font-bold magic-font text-yellow-400 mb-2 drop-shadow-[0_0_15px_rgba(236,201,75,0.8)]">
+            JingMing Academy
+        </h1>
+        <p class="text-2xl text-purple-300 font-bold tracking-widest">人稱代名詞：魔法禁書目錄</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto space-y-16">
+        
+        <!-- 教學區 1: 主格與所有格 -->
+        <section class="scroll-container p-6 md:p-10 mx-2">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">📜</span>
+                <h2 class="text-2xl md:text-3xl font-bold border-b-4 border-brown-600">魔法對照：主格與所有格</h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-center magic-table">
+                    <thead>
+                        <tr>
+                            <th class="p-3" rowspan="2">人稱</th>
+                            <th class="p-3 border-l border-white/30" colspan="2">單數 (Singular)</th>
+                            <th class="p-3 border-l border-white/30" colspan="2">複數 (Plural)</th>
+                        </tr>
+                        <tr class="bg-amber-900/10">
+                            <th class="p-2 border border-white/20">主格</th>
+                            <th class="p-2 border border-white/20">所有格</th>
+                            <th class="p-2 border border-white/20">主格</th>
+                            <th class="p-2 border border-white/20">所有格</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-lg">
+                        <tr>
+                            <td class="p-4 font-bold bg-amber-100">第一人稱</td>
+                            <td class="p-4">I</td>
+                            <td class="p-4 text-purple-700 font-bold">my</td>
+                            <td class="p-4 bg-amber-50">we</td>
+                            <td class="p-4 bg-amber-50 text-purple-700 font-bold">our</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold bg-amber-100">第二人稱</td>
+                            <td class="p-4">you</td>
+                            <td class="p-4 text-purple-700 font-bold">your</td>
+                            <td class="p-4 bg-amber-50">you</td>
+                            <td class="p-4 bg-amber-50 text-purple-700 font-bold">your</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-bold bg-amber-100">第三人稱</td>
+                            <td class="p-4 text-left pl-8">he / she / it</td>
+                            <td class="p-4 text-left pl-8 text-purple-700 font-bold">his / her / its</td>
+                            <td class="p-4 bg-amber-50">they</td>
+                            <td class="p-4 bg-amber-50 text-purple-700 font-bold">their</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 易混淆點 -->
+            <div class="mt-10 bg-yellow-100/80 p-6 rounded-2xl border-2 border-yellow-600 shadow-inner">
+                <h3 class="text-xl font-bold text-red-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i> 魔法陷阱：It's vs Its
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500">
+                        <span class="spell-tag mb-2 inline-block">It's = It is</span>
+                        <p class="text-lg mt-2 font-medium">Ex: <span class="bg-yellow-200 px-1 underline">It's</span> a cat.</p>
+                        <p class="text-gray-500 text-sm italic">這是一隻貓。</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500">
+                        <span class="spell-tag mb-2 inline-block" style="background: #4a3728">Its (所有格)</span>
+                        <p class="text-lg mt-2 font-medium">Ex: <span class="bg-yellow-200 px-1 underline">Its</span> name is Kitty.</p>
+                        <p class="text-gray-500 text-sm italic">它的名字叫 Kitty。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 教學區 2: 人稱排列順序 -->
+        <section class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/20 shadow-2xl">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="bg-yellow-400 p-3 rounded-full text-blue-900 text-2xl">
+                    <i class="fas fa-sort-numeric-down"></i>
+                </div>
+                <h2 class="text-3xl font-bold">排列咒語：主格出現順序</h2>
+            </div>
+            
+            <p class="text-xl mb-8 text-purple-200">當兩個以上的人稱代名詞並用時，請遵循以下排位：</p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 單數 -->
+                <div class="order-box flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-amber-900 font-bold text-2xl mb-2 flex justify-between">
+                            (1) 單數情形 <span class="text-purple-600">2 → 3 → 1</span>
+                        </h4>
+                        <div class="h-1 bg-amber-900/20 w-full mb-4"></div>
+                        <p class="text-gray-700 text-lg leading-relaxed">
+                            就像禮讓他人一樣，最後才說「我」。
+                        </p>
+                    </div>
+                    <div class="bg-amber-900 text-white p-4 rounded-xl mt-4 font-mono">
+                        Ex: <span class="text-yellow-300">You</span>, <span class="text-yellow-300">he</span> and <span class="text-yellow-300">I</span> are hard-working students.
+                    </div>
+                </div>
+
+                <!-- 複數 -->
+                <div class="order-box border-purple-400 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-amber-900 font-bold text-2xl mb-2 flex justify-between">
+                            (2) 複數情形 <span class="text-blue-600">1 → 2 → 3</span>
+                        </h4>
+                        <div class="h-1 bg-amber-900/20 w-full mb-4"></div>
+                        <p class="text-gray-700 text-lg leading-relaxed">
+                            複數時，我們先站出來承擔。
+                        </p>
+                    </div>
+                    <div class="bg-indigo-900 text-white p-4 rounded-xl mt-4 font-mono">
+                        Ex: <span class="text-yellow-300">We</span>, <span class="text-yellow-300">you</span>, and <span class="text-yellow-300">they</span> join the basketball club.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 挑戰區 -->
+        <section class="bg-black/20 p-8 rounded-3xl border border-white/10">
+            <h2 class="text-3xl font-bold mb-8 text-center text-yellow-400">⚡ 魔法實戰演練 ⚡</h2>
+            
+            <div id="quiz-container" class="space-y-6">
+                <!-- JS 動態生成 -->
+            </div>
+
+            <div class="mt-10 flex flex-col md:flex-row items-center justify-between bg-black/40 p-6 rounded-2xl gap-4">
+                <div class="text-2xl font-bold">
+                    魔法修為 (Score): <span id="score" class="text-yellow-400 text-4xl ml-2">0</span>
+                </div>
+                <button onclick="resetQuiz()" class="bg-purple-600 hover:bg-purple-500 px-10 py-3 rounded-full font-bold transition-all shadow-lg hover:shadow-purple-500/50">
+                    <i class="fas fa-magic mr-2"></i> 重置魔法能量
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-16 text-gray-500">
+        <p>© 2026 金名升私中特訓班 | 精準教學，成就未來</p>
+    </footer>
+
+    <script>
+        const quizData = [
+            { 
+                q: "Look! _______ (It's/Its) my pet dog.", 
+                a: "It's", 
+                hint: "這裡是「它是...」的意思 (It is)。" 
+            },
+            { 
+                q: "The cat is washing _______ (it's/its) face.", 
+                a: "its", 
+                hint: "這是「它的」面孔 (所有格)。" 
+            },
+            { 
+                q: "_______ (You, he and I / I, you and he) are best friends.", 
+                a: "You, he and I", 
+                hint: "單數人稱並列，順序為 2, 3, 1。" 
+            },
+            { 
+                q: "_______ (We, you and they / They, we and you) won the game.", 
+                a: "We, you and they", 
+                hint: "複數人稱並列，順序為 1, 2, 3。" 
+            },
+            { 
+                q: "I like that bird. _______ (It's/Its) wings are blue.", 
+                a: "Its", 
+                hint: "指代「它的」翅膀。" 
+            }
+        ];
+
+        let score = 0;
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            quizData.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'quiz-card bg-white/5 p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-center gap-6';
+                card.innerHTML = `
+                    <div class="flex-1">
+                        <div class="text-sm text-purple-400 font-bold mb-1">TASK 0${idx+1}</div>
+                        <div class="text-xl font-medium">
+                            ${item.q.replace('_______', `<input type="text" id="q${idx}" class="mx-2 bg-transparent border-b-2 border-yellow-400 outline-none w-48 text-center text-yellow-300 font-bold focus:border-white transition-all" placeholder="輸入咒語...">`)}
+                        </div>
+                    </div>
+                    <button onclick="checkAnswer(${idx})" id="btn${idx}" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl font-bold transition-all w-full md:w-auto">
+                        施法
+                    </button>
+                    <div id="feedback${idx}" class="hidden font-bold"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkAnswer(idx) {
+            const input = document.getElementById(`q${idx}`);
+            const btn = document.getElementById(`btn${idx}`);
+            const feedback = document.getElementById(`feedback${idx}`);
+            const val = input.value.trim().toLowerCase();
+            const correct = quizData[idx].a.toLowerCase();
+
+            if (val === correct) {
+                feedback.innerHTML = '<i class="fas fa-check-circle text-green-400 text-2xl"></i>';
+                feedback.classList.remove('hidden');
+                btn.className = "bg-green-600 text-white px-6 py-2 rounded-xl font-bold pointer-events-none";
+                btn.innerHTML = "成功";
+                input.readOnly = true;
+                score += 20;
+                updateScore();
+                createSparkles(input);
+            } else {
+                input.classList.add('animate-shake', 'border-red-500');
+                feedback.innerHTML = `<span class="text-red-400 text-sm">提示: ${quizData[idx].hint}</span>`;
+                feedback.classList.remove('hidden');
+                setTimeout(() => input.classList.remove('animate-shake', 'border-red-500'), 500);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = score;
+            if (score >= 100) {
+                setTimeout(showVictory, 500);
+            }
+        }
+
+        function createSparkles(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 12; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const tx = (Math.random() - 0.5) * 150;
+                const ty = (Math.random() - 0.5) * 150;
+                s.style.setProperty('--tx', `${tx}px`);
+                s.style.setProperty('--ty', `${ty}px`);
+                s.style.left = `${rect.left + rect.width / 2}px`;
+                s.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+                s.style.width = '8px';
+                s.style.height = '8px';
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 800);
+            }
+        }
+
+        function showVictory() {
+            const v = document.createElement('div');
+            v.className = 'fixed inset-0 bg-black/90 flex items-center justify-center z-50 animate-fade-in';
+            v.innerHTML = `
+                <div class="text-center p-10 bg-gradient-to-b from-purple-800 to-indigo-900 border-4 border-yellow-400 rounded-3xl max-w-sm">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-3xl font-bold text-yellow-400 mb-2">傳奇大法師！</h3>
+                    <p class="text-white mb-6">你已完美精通代名詞的排列與用法！</p>
+                    <button onclick="location.reload()" class="bg-yellow-400 text-black px-8 py-2 rounded-full font-bold">重新閉關</button>
+                </div>
+            `;
+            document.body.appendChild(v);
+        }
+
+        function resetQuiz() {
+            score = 0;
+            document.getElementById('score').innerText = '0';
+            initQuiz();
+        }
+
+        window.onload = initQuiz;
+    </script>
+
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+    </style>
+</body>
+</html>

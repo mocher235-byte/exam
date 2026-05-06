@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名文理 | 升私中英文特訓總目錄</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .lesson-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-12 px-6 shadow-lg mb-10">
+        <div class="max-w-5xl mx-auto text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">升私中英文特訓班</h1>
+            <p class="text-blue-100 text-lg">全系列課程學習總目錄</p>
+            <div class="mt-6 inline-block bg-white/20 px-4 py-2 rounded-full text-sm backdrop-blur-sm">
+                金名文理補習班 專用教材
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4">
+        
+        <!-- 文法篇 -->
+        <section class="mb-16">
+            <div class="flex items-center mb-8 border-l-8 border-blue-600 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">文法篇 (Grammar)</h2>
+                <span class="ml-4 text-gray-500 font-medium">共 20 課</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 第一課 (連結到您已做好的資料夾) -->
+                <a href="lesson1/index.html" class="lesson-card bg-white p-5 rounded-xl border border-blue-100 transition-all duration-300 block">
+                    <div class="text-blue-600 font-bold text-sm mb-1">文法 1</div>
+                    <div class="text-gray-800 font-bold text-lg mb-2">人稱代名詞主格/所有格</div>
+                    <div class="text-blue-500 text-xs flex items-center">
+                        <span>立即學習</span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                </a>
+
+                <!-- 預留位置範例 -->
+                <script>
+                    const grammarLessons = [
+                        "be 動詞直述句與疑問句", "Who 的問答句", "指示代名詞 this, that, these, those",
+                        "Where 詢問位置", "What time...? 的問答句", "What day...? 的問答句",
+                        "詢問日期的方法", "現在進行式", "助動詞 can 的用法",
+                        "現在簡單式", "過去式", "未來式", "搭乘交通工具的用法",
+                        "詢問天氣的說法", "詢問數量的說法", "問路句型",
+                        "形容詞的三級", "動名詞", "不定詞與虛主詞 it"
+                    ];
+                    grammarLessons.forEach((title, index) => {
+                        document.write(`
+                            <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 opacity-60">
+                                <div class="text-gray-400 font-bold text-sm mb-1">文法 ${index + 2}</div>
+                                <div class="text-gray-500 font-bold text-lg">${title}</div>
+                                <div class="mt-2 text-gray-400 text-xs">製作中...</div>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+        </section>
+
+        <!-- 單字篇 -->
+        <section>
+            <div class="flex items-center mb-8 border-l-8 border-green-600 pl-4">
+                <h2 class="text-2xl font-bold text-gray-800">單字篇 (Vocabulary)</h2>
+                <span class="ml-4 text-gray-500 font-medium">共 10 課</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <script>
+                    const vocabLessons = [
+                        "人物、家庭、職業", "身體五官、動物、顏色", "學校、嗜好", "時間",
+                        "地點(1)", "地點(2)、交通、節日", "天氣、衣服配件", "食物",
+                        "不規則動詞(1)", "不規則動詞(2)"
+                    ];
+                    vocabLessons.forEach((title, index) => {
+                        document.write(`
+                            <div class="bg-white p-5 rounded-xl border border-green-100 opacity-60">
+                                <div class="text-green-600 font-bold text-sm mb-1">單字 ${index + 1}</div>
+                                <div class="text-gray-800 font-bold text-lg">${title}</div>
+                                <div class="mt-2 text-gray-400 text-xs font-medium">製作中...</div>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-20 text-center text-gray-400 text-sm">
+        <p>&copy; 2026 金名文理補習班. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

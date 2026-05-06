@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國字注音 · 字靈召喚術</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .relative.z-10 { position: static; }
+        }
+
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 selection:bg-amber-500/30 overflow-x-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+
+        // 圖示組件封裝
+        const Icon = ({ name, className = "w-5 h-5" }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name} className={className}></i>;
+        };
+
+        const quizSource = [
+            { id: 1, phrase: "「摻」雜塑化劑", zhuyin: "ㄔㄢ", char: "摻", distractors: ["慘", "滲"], note: "指混合、添加。" },
+            { id: 2, phrase: "「圈」養家畜", zhuyin: "ㄐㄩㄢˋ", char: "圈", distractors: ["捲", "倦", "眷"], note: "指把牲畜關在欄裡養。" },
+            { id: 3, phrase: "氣「氛」凝滯", zhuyin: "ㄈㄣ", char: "氛", distractors: ["芬", "粉", "紛"], note: "指周圍的氣氛、環境。" },
+            { id: 4, phrase: "陷「溺」其中", zhuyin: "ㄋㄧˋ", char: "溺", distractors: ["弱", "溺"], note: "沉溺、陷入其中不能自拔。" },
+            { id: 5, phrase: "哀「悼」死者", zhuyin: "ㄉㄠˋ", char: "悼", distractors: ["掉", "卓", "綽"], note: "指追悼、懷念死者。" },
+            { id: 6, phrase: "機車輪「胎」", zhuyin: "ㄊㄞ", char: "胎", distractors: ["怠", "抬", "殆"], note: "車輪外部的橡膠圈。" },
+            { id: 7, phrase: "蓄意挑「釁」", zhuyin: "ㄒㄒㄧㄣˋ", char: "釁", distractors: ["興", "悻"], note: "指故意製造爭端。" },
+            { id: 8, phrase: "圍牆傾「圮」", zhuyin: "ㄆㄧˇ", char: "圮", distractors: ["杞", "妃", "配"], note: "倒塌、毀壞。" },
+            { id: 9, phrase: "牛山濯「濯」", zhuyin: "ㄓㄨㄛˊ", char: "濯", distractors: ["躍", "翟", "糴"], note: "形容光禿禿的樣子。" },
+            { id: 10, phrase: "合歡溪「畔」", zhuyin: "ㄆㄢˋ", char: "畔", distractors: ["判", "絆", "伴"], note: "水邊。" },
+            { id: 11, phrase: "回家奔「喪」", zhuyin: "ㄙㄤ", char: "喪", distractors: ["傷", "桑", "尚"], note: "辦理喪事。" },
+            { id: 12, phrase: "漸漸消「褪」", zhuyin: "ㄊㄨㄟˋ", char: "褪", distractors: ["腿", "退", "推"], note: "顏色脫落、減色。" },
+            { id: 13, phrase: "事有蹊「蹺」", zhuyin: "ㄑㄧㄠ", char: "蹺", distractors: ["翹", "饒", "堯"], note: "奇怪、有問題。" },
+            { id: 14, phrase: "「淘」洗衣物", zhuyin: "ㄊㄠˊ", char: "淘", distractors: ["掏", "陶", "萄"], note: "用水沖洗掉雜質。" },
+            { id: 15, phrase: "「駭」人聽聞", zhuyin: "ㄏㄞˋ", char: "駭", distractors: ["該", "核", "孩"], note: "令人震驚恐懼。" },
+            { id: 16, phrase: "「啟」蒙老師", zhuyin: "ㄑㄧˇ", char: "啟", distractors: ["起", "豈"], note: "開發矇昧，教育初步。" },
+            { id: 17, phrase: "「蠶」食鯨吞", zhuyin: "ㄘㄢˊ", char: "蠶", distractors: ["層", "曾", "參"], note: "比喻侵占、併吞。" },
+            { id: 18, phrase: "「渾」然忘我", zhuyin: "ㄏㄨㄣˊ", char: "渾", distractors: ["魂", "混", "揮"], note: "全然的樣子。" },
+            { id: 19, phrase: "「摩」拳擦掌", zhuyin: "ㄇㄛˊ", char: "摩", distractors: ["磨", "魔", "麼"], note: "形容精神振奮、躍躍欲試。" },
+            { id: 20, phrase: "「豪」雨不斷", zhuyin: "ㄏㄠˊ", char: "豪", distractors: ["毫", "壕", "嚎"], note: "指大雨。" },
+            { id: 21, phrase: "「魚」貫前進", zhuyin: "ㄩˊ", char: "魚", distractors: ["漁", "語", "予"], note: "形容排成一列前進。" },
+            { id: 22, phrase: "遮「蔽」天空", zhuyin: "ㄅㄧˋ", char: "蔽", distractors: ["避", "弊", "斃"], note: "遮掩。" },
+            { id: 23, phrase: "繁「殖」種苗", zhuyin: "ㄓˊ", char: "殖", distractors: ["植", "直", "值"], note: "生長發育、繁衍。" },
+            { id: 24, phrase: "情「竇」初開", zhuyin: "ㄉㄡˋ", char: "竇", distractors: ["讀", "督", "豆"], note: "指男女間情愛慾望開始萌芽。" },
+            { id: 25, phrase: "疆「域」廣大", zhuyin: "ㄩˋ", char: "域", distractors: ["或", "惑", "浴"], note: "領土。" },
+            { id: 26, phrase: "倒「楣」透頂", zhuyin: "ㄇㄟˊ", char: "楣", distractors: ["眉", "煤", "莓"], note: "運氣不好。" },
+            { id: 27, phrase: "懊「惱」不已", zhuyin: "ㄋㄠˇ", char: "惱", distractors: ["腦", "瑙", "老"], note: "煩惱、悔恨。" },
+            { id: 28, phrase: "視「若」無睹", zhuyin: "ㄖㄨㄛˋ", char: "若", distractors: ["惹", "諾", "弱"], note: "好像。" },
+            { id: 29, phrase: "大「功」告成", zhuyin: "ㄍㄨㄥ", char: "功", distractors: ["工", "公", "攻"], note: "事業。" },
+            { id: 30, phrase: "出「其」不意", zhuyin: "ㄑㄧˊ", char: "其", distractors: ["奇", "旗", "期"], note: "他的、那種。" },
+            { id: 31, phrase: "隔「靴」搔癢", zhuyin: "ㄒㄩㄝ", char: "靴", distractors: ["學", "薛"], note: "比喻不切實際，不能解決問題。" },
+            { id: 32, phrase: "不「明」所以", zhuyin: "ㄇㄧㄥˊ", char: "明", distractors: ["名", "銘", "冥"], note: "明白、清楚。" },
+            { id: 33, phrase: "義「憤」填膺", zhuyin: "ㄈㄣˋ", char: "憤", distractors: ["份", "奮", "墳"], note: "憤慨、憤怒。" },
+            { id: 34, phrase: "愧「疚」不已", zhuyin: "ㄐㄧㄡˋ", char: "疚", distractors: ["救", "究", "就"], note: "慚愧、不安。" },
+            { id: 35, phrase: "考試「焦」點", zhuyin: "ㄐㄧㄠ", char: "焦", distractors: ["教", "郊", "嬌"], note: "重心。" },
+            { id: 36, phrase: "案情「詭」異", zhuyin: "ㄍㄨㄟˇ", char: "詭", distractors: ["跪", "鬼", "傀"], note: "奇異、反常。" },
+            { id: 37, phrase: "臉頰「泛」紅", zhuyin: "ㄈㄢˋ", char: "泛", distractors: ["反", "販", "飯"], note: "呈現、透露。" },
+            { id: 38, phrase: "來回「穿」梭", zhuyin: "ㄔㄨㄢ", char: "穿", distractors: ["川", "村", "喘"], note: "通過。" },
+            { id: 39, phrase: "位高「權」重", zhuyin: "ㄑㄩㄢˊ", char: "權", distractors: ["全", "泉", "拳"], note: "權力。" },
+            { id: 40, phrase: "成績「揭」曉", zhuyin: "ㄐㄧㄝ", char: "揭", distractors: ["捷", "街", "皆"], note: "公佈、顯露。" },
+            { id: 41, phrase: "瞻仰「遺」容", zhuyin: "ㄧˊ", char: "遺", distractors: ["儀", "宜", "移"], note: "死者留下的。" },
+            { id: 42, phrase: "獎品豐「盛」", zhuyin: "ㄕㄥˋ", char: "盛", distractors: ["聖", "乘", "勝"], note: "豐富。" },
+            { id: 43, phrase: "商店打「烊」", zhuyin: "ㄧㄤˊ", char: "烊", distractors: ["洋", "樣", "癢"], note: "商店關門停止營業。" },
+            { id: 44, phrase: "室內裝「潢」", zhuyin: "ㄏㄨㄤˊ", char: "潢", distractors: ["黃", "簧", "皇"], note: "裝飾。" },
+            { id: 45, phrase: "沉魚落「雁」", zhuyin: "ㄧㄢˋ", char: "雁", distractors: ["燕", "諺", "厭"], note: "形容女子容貌極美。" },
+            { id: 46, phrase: "雲淡風「清」", zhuyin: "ㄑㄧㄥ", char: "清", distractors: ["輕", "青", "親"], note: "清靜。" },
+            { id: 47, phrase: "典雅高「尚」", zhuyin: "ㄕㄤˋ", char: "尚", distractors: ["上", "像", "商"], note: "崇高、優良。" },
+            { id: 48, phrase: "自顧不「暇」", zhuyin: "ㄒㄧㄚˊ", char: "暇", distractors: ["假", "瑕", "峽"], note: "空閒。" },
+            { id: 49, phrase: "一會兒「工」夫", zhuyin: "ㄍㄨㄥ", char: "工", distractors: ["功", "供", "公"], note: "時間。" },
+            { id: 50, phrase: "心存僥「倖」", zhuyin: "ㄒㄧㄥˋ", char: "倖", distractors: ["幸", "性", "興"], note: "希求意外獲利。" }
+        ].sort((a, b) => a.id - b.id);
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('library');
+            const [quizIndex, setQuizIndex] = useState(0);
+            const [userAnswers, setUserAnswers] = useState({});
+            const [showResult, setShowResult] = useState(false);
+            const [studentName, setStudentName] = useState('');
+
+            const shuffledQuiz = useMemo(() => {
+                return quizSource.map(q => {
+                    const options = [...new Set([q.char, ...q.distractors])].sort(() => Math.random() - 0.5);
+                    return { ...q, options };
+                });
+            }, []);
+
+            const handleAnswer = (answer) => {
+                setUserAnswers(prev => ({ ...prev, [quizIndex]: answer }));
+                if (quizIndex < shuffledQuiz.length - 1) {
+                    setTimeout(() => setQuizIndex(quizIndex + 1), 300);
+                }
+            };
+
+            const calculateScore = () => {
+                let correct = 0;
+                shuffledQuiz.forEach((q, i) => {
+                    if (userAnswers[i] === q.char) correct++;
+                });
+                return Math.round((correct / shuffledQuiz.length) * 100);
+            };
+
+            const reset = () => {
+                setQuizIndex(0);
+                setUserAnswers({});
+                setShowResult(false);
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
+                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 rounded-full blur-[120px] animate-pulse" />
+                        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-600 rounded-full blur-[120px] animate-pulse" />
+                    </div>
+
+                    <div className="relative z-10 pb-32">
+                        <header className="no-print pt-16 pb-24 px-6 text-center">
+                            <div className="max-w-5xl mx-auto">
+                                <h1 className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-8 mb-8">
+                                    <span className="text-5xl sm:text-7xl lg:text-8xl font-black italic bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 bg-clip-text text-transparent drop-shadow-sm">國字注音</span>
+                                    <span className="hidden md:block text-slate-800 text-6xl font-light">|</span>
+                                    <span className="text-5xl sm:text-7xl lg:text-8xl font-black italic bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 bg-clip-text text-transparent drop-shadow-sm">字靈召喚術</span>
+                                </h1>
+                                <div className="inline-flex items-center gap-3 px-8 py-3 bg-slate-900/50 border border-amber-500/30 rounded-full text-amber-500 font-bold shadow-lg backdrop-blur-md">
+                                    <Icon name="sparkles" className="w-5 h-5 animate-pulse" />
+                                    金名魔法學院 · 50 題精英字魂試煉
+                                </div>
+                            </div>
+                        </header>
+
+                        <main className="max-w-6xl mx-auto px-4 -mt-12">
+                            <nav className="no-print flex justify-center gap-4 mb-12">
+                                <button onClick={() => setActiveTab('library')} className={`px-8 py-4 rounded-2xl font-black flex items-center gap-3 transition-all transform active:scale-95 ${activeTab === 'library' ? 'bg-amber-500 text-slate-950 shadow-[0_0_30px_rgba(245,158,11,0.5)]' : 'bg-slate-900/80 text-slate-400 border border-slate-800 hover:border-slate-600'}`}>
+                                    <Icon name="book" /> 奧義書架
+                                </button>
+                                <button onClick={() => setActiveTab('quiz')} className={`px-8 py-4 rounded-2xl font-black flex items-center gap-3 transition-all transform active:scale-95 ${activeTab === 'quiz' ? 'bg-amber-500 text-slate-950 shadow-[0_0_30px_rgba(245,158,11,0.5)]' : 'bg-slate-900/80 text-slate-400 border border-slate-800 hover:border-slate-600'}`}>
+                                    <Icon name="swords" /> 終極試煉
+                                </button>
+                            </nav>
+
+                            {activeTab === 'library' ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    {quizSource.map((item) => (
+                                        <div key={item.id} className="group p-6 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-amber-500/50 backdrop-blur-sm transition-all">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <span className="text-slate-600 font-mono text-xs font-bold">字靈 #{String(item.id).padStart(2, '0')}</span>
+                                                <span className="px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-black rounded-lg border border-amber-500/20">{item.zhuyin}</span>
+                                            </div>
+                                            <h3 className="text-2xl font-black text-white mb-3 group-hover:text-amber-400 transition-colors">
+                                                {item.phrase.split(`「${item.char}」`).map((part, i, arr) => (
+                                                    <React.Fragment key={i}>
+                                                        {part}
+                                                        {i < arr.length - 1 && <span className="text-amber-500">「{item.char}」</span>}
+                                                    </React.Fragment>
+                                                ))}
+                                            </h3>
+                                            <p className="text-slate-500 text-sm italic leading-relaxed border-t border-slate-800/50 pt-3">{item.note}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="max-w-4xl mx-auto space-y-8">
+                                    {!showResult ? (
+                                        <div className="animate-in fade-in zoom-in duration-500 space-y-8">
+                                            <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800 backdrop-blur-sm shadow-xl">
+                                                <div className="flex items-center gap-2 mb-4 text-xs font-black text-slate-500 uppercase tracking-widest">
+                                                    <Icon name="sparkles" className="w-4 h-4" /> 靈力地圖 · 關卡選取
+                                                </div>
+                                                <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+                                                    {shuffledQuiz.map((_, i) => {
+                                                        const isAnswered = userAnswers[i] !== undefined;
+                                                        const isCurrent = quizIndex === i;
+                                                        return (
+                                                            <button key={i} onClick={() => setQuizIndex(i)} className={`h-11 rounded-xl font-black text-xs transition-all border-2 flex items-center justify-center transform active:scale-90 ${isCurrent ? 'bg-amber-500 border-amber-300 text-slate-950 scale-110 shadow-lg z-10' : isAnswered ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-slate-950/50 border-slate-800 text-slate-600 hover:border-slate-500'}`}>
+                                                                {i + 1}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <div className="relative p-8 md:p-16 rounded-[48px] bg-slate-900/60 border border-amber-500/10 shadow-2xl overflow-hidden backdrop-blur-md">
+                                                <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-800/50">
+                                                    <div className="h-full bg-amber-500 transition-all duration-500 shadow-[0_0_15px_#f59e0b]" style={{ width: `${(Object.keys(userAnswers).length / shuffledQuiz.length) * 100}%` }} />
+                                                </div>
+
+                                                <div className="flex justify-between items-center mb-16">
+                                                    <button onClick={() => setQuizIndex(Math.max(0, quizIndex - 1))} className="p-3 rounded-full bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:border-amber-500 transition-all disabled:opacity-30" disabled={quizIndex === 0}>
+                                                        <Icon name="chevron-left" />
+                                                    </button>
+                                                    <div className="text-center">
+                                                        <div className="text-amber-500/50 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Trial Level</div>
+                                                        <div className="text-3xl font-black text-white">{quizIndex + 1} <span className="text-slate-700 text-xl">/ 50</span></div>
+                                                    </div>
+                                                    <button onClick={() => setQuizIndex(Math.min(shuffledQuiz.length - 1, quizIndex + 1))} className="p-3 rounded-full bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:border-amber-500 transition-all disabled:opacity-30" disabled={quizIndex === shuffledQuiz.length - 1}>
+                                                        <Icon name="chevron-right" />
+                                                    </button>
+                                                </div>
+
+                                                <div className="mb-16 text-center space-y-6">
+                                                    <h2 className="text-4xl sm:text-6xl font-black text-white leading-relaxed px-4">
+                                                        {shuffledQuiz[quizIndex].phrase.split(`「${shuffledQuiz[quizIndex].char}」`).map((part, i, arr) => (
+                                                            <React.Fragment key={i}>
+                                                                {part}
+                                                                {i < arr.length - 1 && (
+                                                                    <span className="inline-block mx-4 px-6 py-2 border-b-4 border-amber-500/40 text-amber-500 italic bg-amber-500/5 rounded-t-xl">
+                                                                        （ {shuffledQuiz[quizIndex].zhuyin} ）
+                                                                    </span>
+                                                                )}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </h2>
+                                                    <p className="text-slate-500 font-medium italic tracking-wide">感應字靈波動，選取正確的字魂...</p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    {shuffledQuiz[quizIndex].options.map((opt, idx) => (
+                                                        <button key={idx} onClick={() => handleAnswer(opt)} className={`p-8 rounded-3xl text-left border-2 transition-all flex items-center justify-between group transform active:scale-[0.98] ${userAnswers[quizIndex] === opt ? 'bg-amber-500 border-amber-300 text-slate-950' : 'bg-slate-950/40 border-slate-800 hover:border-amber-500/40 text-slate-200 hover:bg-slate-900/50'}`}>
+                                                            <span className="text-4xl font-black">{opt}</span>
+                                                            {userAnswers[quizIndex] === opt && <Icon name="check" className="w-8 h-8" />}
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                {Object.keys(userAnswers).length === shuffledQuiz.length && (
+                                                    <div className="mt-20 pt-10 border-t border-slate-800 flex justify-center">
+                                                        <button onClick={() => setShowResult(true)} className="px-16 py-6 bg-emerald-500 text-slate-950 rounded-2xl font-black text-2xl shadow-[0_0_50px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-4">
+                                                            解除靈力封印 <Icon name="sparkles" className="w-6 h-6" />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-8 animate-in fade-in zoom-in duration-700">
+                                            <div className="p-16 rounded-[60px] bg-slate-900/60 border border-amber-500/20 text-center backdrop-blur-xl relative overflow-hidden shadow-2xl">
+                                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.05),transparent)] pointer-events-none" />
+                                                <div className="relative z-10">
+                                                    <div className="w-24 h-24 bg-amber-500/10 rounded-3xl flex items-center justify-center text-amber-500 mx-auto mb-10 border border-amber-500/20 rotate-12">
+                                                        <Icon name="trophy" className="w-12 h-12" />
+                                                    </div>
+                                                    <h2 className="text-xl font-black text-slate-500 mb-2 tracking-[0.4em] uppercase">法力鑑定報告單</h2>
+                                                    <div className="text-[12rem] leading-none font-black bg-gradient-to-b from-amber-200 to-amber-600 bg-clip-text text-transparent mb-8">
+                                                        {calculateScore()}
+                                                    </div>
+                                                    <p className="text-3xl font-black text-white mb-12">
+                                                        {calculateScore() === 100 ? "字魂大師：萬象俱現，無可遁形" : calculateScore() >= 80 ? "高階法師：洞若觀火，靈氣逼人" : calculateScore() >= 60 ? "見習法師：尚能感應，需勤加苦練" : "入學麻瓜：靈力枯竭，請速回書架"}
+                                                    </p>
+                                                    <div className="max-w-xs mx-auto mb-12">
+                                                        <input type="text" placeholder="請輸入法師尊號..." className="w-full bg-slate-950 border-2 border-slate-800 rounded-2xl p-6 text-center text-2xl text-white font-black focus:border-amber-500 transition-all outline-none" value={studentName} onChange={(e) => setStudentName(e.target.value)} />
+                                                    </div>
+                                                    <div className="flex flex-wrap justify-center gap-4 no-print">
+                                                        <button onClick={() => window.print()} className="px-12 py-5 bg-white text-slate-950 rounded-2xl font-black flex items-center gap-3 hover:bg-amber-500 transition-all shadow-xl">
+                                                            <Icon name="file-text" /> 列印證明書
+                                                        </button>
+                                                        <button onClick={reset} className="px-12 py-5 bg-slate-800 text-white rounded-2xl font-black flex items-center gap-3 hover:bg-slate-700 transition-all border border-slate-700 shadow-xl">
+                                                            <Icon name="rotate-ccw" /> 重啟修煉
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-10 rounded-[40px] bg-slate-900/40 border border-slate-800 backdrop-blur-md">
+                                                <h3 className="text-2xl font-black text-amber-500 mb-10 flex items-center gap-3">
+                                                    <Icon name="sparkles" className="w-6 h-6" /> 字魂回溯解析
+                                                </h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {shuffledQuiz.map((q, i) => {
+                                                        const isCorrect = userAnswers[i] === q.char;
+                                                        return (
+                                                            <div key={i} className={`p-6 rounded-3xl border-2 transition-all ${isCorrect ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-rose-500/5 border-rose-500/20'}`}>
+                                                                <div className="flex justify-between items-start mb-4">
+                                                                    <div className="font-black text-lg text-white">
+                                                                        <span className="text-slate-600 mr-2">#{i+1}</span>
+                                                                        {q.phrase.replace(`「${q.char}」`, `「 ${q.char} 」`)}
+                                                                    </div>
+                                                                    {isCorrect ? <Icon name="check" className="text-emerald-500 w-6 h-6" /> : <Icon name="x-circle" className="text-rose-500 w-6 h-6" />}
+                                                                </div>
+                                                                <div className="flex flex-wrap gap-2 text-xs font-black">
+                                                                    <span className={`px-4 py-2 rounded-xl ${isCorrect ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'}`}>
+                                                                        召喚：{userAnswers[i] || "失敗"}
+                                                                    </span>
+                                                                    {!isCorrect && <span className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-xl border border-emerald-500/30">真名：{q.char} ({q.zhuyin})</span>}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </main>
+
+                        <footer className="no-print fixed bottom-0 left-0 w-full bg-slate-950/80 backdrop-blur-xl border-t border-slate-800/50 p-4 z-50">
+                            <div className="max-w-6xl mx-auto flex justify-between items-center px-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                                        <Icon name="sparkles" className="w-6 h-6 animate-spin-slow" />
+                                    </div>
+                                    <div className="hidden xs:block">
+                                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest leading-none mb-1">Current Trial</p>
+                                        <p className="text-white font-black text-sm">國字注音 · 字靈召喚</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-8">
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest leading-none mb-1">Progress</p>
+                                        <div className="flex items-center gap-3">
+                                            <div className="hidden sm:block w-32 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                                <div className="h-full bg-amber-500 transition-all" style={{ width: `${(Object.keys(userAnswers).length / 50) * 100}%` }} />
+                                            </div>
+                                            <span className="text-white font-black text-sm">{Object.keys(userAnswers).length} / 50</span>
+                                        </div>
+                                    </div>
+                                    <button onClick={reset} className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2.5 rounded-xl font-black text-xs transition-all border border-slate-700 active:scale-95">重置</button>
+                                </div>
+                            </div>
+                        </footer>
+
+                        <div className="print-only p-12 text-black bg-white">
+                            <div className="text-center border-b-8 border-double border-black pb-8 mb-12">
+                                <h1 className="text-5xl font-black mb-4 tracking-tighter">金名魔法學院 - 字靈修煉證明書</h1>
+                                <p className="text-xl font-bold italic tracking-widest uppercase">靈力鑑定委員會 · 認證報告</p>
+                            </div>
+                            <div className="flex justify-between items-center mb-12 text-2xl font-black">
+                                <p>召喚師尊號：{studentName || "________________"}</p>
+                                <p>鑑定法力值：{calculateScore()} / 100</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-12 gap-y-6">
+                                {shuffledQuiz.map((q, i) => (
+                                    <div key={i} className="border-b border-gray-300 pb-2 flex justify-between items-center text-sm">
+                                        <span className="font-bold">{i+1}. {q.phrase} ({q.zhuyin})</span>
+                                        <span className="font-black">召喚：{userAnswers[i] || "失敗"} {userAnswers[i] === q.char ? "✓" : `(✗ ${q.char})`}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

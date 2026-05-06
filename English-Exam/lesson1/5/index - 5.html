@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升私中特訓班 - 代名詞與所有格魔導書 V2.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        :root {
+            --magic-purple: #6b46c1;
+            --magic-gold: #ecc94b;
+            --magic-deep: #1a1a2e;
+            --magic-red: #e53e3e;
+            --magic-green: #38a169;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .magic-font { font-family: 'Nova Script', cursive; }
+
+        /* 題目卡片 */
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(236, 201, 75, 0.1);
+            border-color: var(--magic-gold);
+        }
+
+        .option-correct {
+            background: var(--magic-green) !important;
+            border-color: #48bb78 !important;
+            color: white !important;
+        }
+
+        .option-wrong {
+            background: var(--magic-red) !important;
+            border-color: #feb2b2 !important;
+            color: white !important;
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: #fff;
+            border-radius: 50%;
+            animation: sparkleAnim 0.8s linear forwards;
+            z-index: 100;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: translate(0,0) scale(1.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        .floating { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* 導航按鈕狀態 */
+        .nav-btn-correct { background-color: var(--magic-green) !important; color: white !important; }
+        .nav-btn-wrong { background-color: var(--magic-red) !important; color: white !important; }
+        .nav-btn-current { border: 3px solid var(--magic-gold) !important; transform: scale(1.15); }
+
+        /* 列印樣式 */
+        @media print {
+            body { background: white !important; color: black !important; }
+            header, .no-print, #pagination-grid, .bg-black\/20, button:not(.print-only) { display: none !important; }
+            #mistake-section { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+            #mistake-section .bg-red-950\/30 { background: none !important; border: none !important; padding: 0 !important; }
+            .print-header { display: block !important; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            .mistake-item { 
+                background: white !important; 
+                border: 1px solid #ccc !important; 
+                color: black !important; 
+                margin-bottom: 10px; 
+                page-break-inside: avoid;
+                padding: 10px !important;
+            }
+            .text-red-400 { color: #b91c1c !important; }
+            .text-gray-300, .text-gray-400 { color: #374151 !important; }
+            .print-label { font-weight: bold; }
+        }
+        .print-header { display: none; }
+        .print-only-text { display: none; }
+        @media print { .print-only-text { display: block; } }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: #4a3728; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="text-center mb-12 relative no-print">
+        <div class="inline-block relative">
+            <h1 class="text-5xl md:text-7xl font-bold magic-font text-yellow-400 mb-4 drop-shadow-[0_0_15px_rgba(236,201,75,0.8)] floating">
+                JingMing Magic Academy
+            </h1>
+            <p class="text-xl md:text-2xl text-purple-300 font-bold tracking-widest italic mb-6">代名詞 100 題：全選擇魔導修煉</p>
+            
+            <!-- 姓名輸入區 -->
+            <div class="flex flex-col items-center gap-2 max-w-sm mx-auto">
+                <label class="text-amber-400 font-bold text-sm">請輸入修煉者姓名：</label>
+                <input type="text" id="student-name-input" placeholder="例如：王小明" 
+                    class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 w-full text-center focus:outline-none focus:border-yellow-400 transition-all text-white text-lg">
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-16">
+        
+        <!-- 魔法試煉場 -->
+        <section class="relative bg-black/20 p-6 md:p-10 rounded-[3rem] border border-white/5 no-print">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center text-blue-900 text-3xl shadow-lg">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-4xl font-bold">當前試煉</h2>
+                        <p class="text-gray-400">進度：<span id="progress-text" class="text-yellow-400 font-bold">1/100</span></p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="toggleMistakeSummary()" class="bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 text-red-100 px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                        <i class="fas fa-book-dead"></i> 錯題彙整 (<span id="wrong-count">0</span>)
+                    </button>
+                    <div class="bg-black/40 px-6 py-3 rounded-xl border border-white/10 text-center">
+                        <p class="text-xs text-gray-400 uppercase">總分</p>
+                        <p id="score" class="text-2xl font-bold text-yellow-400">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 題目渲染區 -->
+            <div id="quiz-wrapper" class="min-h-[350px]"></div>
+
+            <!-- 100題 分頁導航 -->
+            <div class="mt-12">
+                <p class="text-sm text-gray-500 mb-4 text-center">快速傳送門 (點擊切換題目)</p>
+                <div class="flex flex-wrap justify-center gap-2 overflow-y-auto max-h-40 p-4 bg-black/30 rounded-2xl" id="pagination-grid"></div>
+            </div>
+        </section>
+
+        <!-- 錯題彙整區 -->
+        <section id="mistake-section" class="hidden animate-in fade-in slide-in-from-bottom-10 duration-500">
+            <!-- 列印專用標頭 -->
+            <div class="print-header">
+                <h1 style="font-size: 24pt; text-align: center; margin-bottom: 10px;">金名升私中特訓班 - 錯題彙整報告</h1>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-size: 14pt;">修煉者：<span id="print-student-name" style="font-weight: bold; text-decoration: underline;">未填寫</span></span>
+                    <span style="font-size: 14pt;">列印日期：<span id="print-date"></span></span>
+                </div>
+                <p style="margin-top: 10px;">總結：共錯了 <span id="print-wrong-count" style="color: red; font-weight: bold;">0</span> 題。請針對以下題目加強練習。</p>
+            </div>
+
+            <div class="bg-red-950/30 border border-red-500/30 p-8 rounded-[3rem]">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 no-print">
+                    <h2 class="text-3xl font-bold text-red-400 flex items-center gap-3">
+                        <i class="fas fa-skull-crossbones"></i> 錯題筆記本
+                    </h2>
+                    <div class="flex gap-4">
+                        <button onclick="window.print()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                            <i class="fas fa-print"></i> 列印錯題集
+                        </button>
+                        <button onclick="toggleMistakeSummary()" class="text-gray-400 hover:text-white px-4">
+                            關閉 <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="mistake-list" class="space-y-4">
+                    <p class="text-gray-500 italic">目前沒有錯題，保持下去！</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-24 py-12 border-t border-white/10 text-gray-500 no-print">
+        <p class="text-lg">金名升私中特訓班 - 英語魔導課程 V2.1 (Print Ready)</p>
+    </footer>
+
+    <!-- 慶祝彈窗 -->
+    <div id="celebration-modal" class="fixed inset-0 bg-black/95 hidden z-[100] flex items-center justify-center p-4 no-print">
+        <div class="bg-gradient-to-br from-indigo-950 to-black p-12 rounded-[40px] border-4 border-yellow-400 text-center max-w-lg w-full">
+            <h3 class="text-5xl font-bold text-yellow-400 mb-6">🏆 傳奇大魔導！</h3>
+            <p class="text-xl text-purple-200 mb-4">你已完成所有 100 題試煉。</p>
+            <div id="final-stats" class="text-white mb-8 text-lg"></div>
+            <button onclick="location.reload()" class="bg-yellow-400 text-black px-12 py-4 rounded-full font-bold text-xl hover:bg-yellow-300 transition-all">
+                重新修煉
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const pronounData = [
+            { person: '第一人稱單數', sub: 'I', obj: 'me', adj: 'my', pron: 'mine' },
+            { person: '第二人稱單數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours' },
+            { person: '第三人稱單數(男)', sub: 'He', obj: 'him', adj: 'his', pron: 'his' },
+            { person: '第三人稱單數(女)', sub: 'She', obj: 'her', adj: 'her', pron: 'hers' },
+            { person: '第三人稱單數(物)', sub: 'It', obj: 'it', adj: 'its', pron: 'its' },
+            { person: '第一人稱複數', sub: 'We', obj: 'us', adj: 'our', pron: 'ours' },
+            { person: '第二人稱複數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours' },
+            { person: '第三人稱複數', sub: 'They', obj: 'them', adj: 'their', pron: 'theirs' }
+        ];
+
+        let questions = [];
+        let userResponses = new Array(100).fill(null);
+        let currentIndex = 0;
+
+        function generateQuestions() {
+            const manualQ = [
+                { q: "______ is Vicky, and he is Kenny.", opts: ["I", "You", "She", "Its"], a: 2, hint: "Vicky 是女生名，主詞用 She。" },
+                { q: "______ is my sister. ______ name is Karen.", opts: ["She; Her", "He; His", "He; Her", "Her; She"], a: 0, hint: "女生主格 She，所有格 Her。" },
+                { q: "Aaron: What a cute puppy! Betty: ______ name is Lucky.", opts: ["Its", "It's", "It", "It is"], a: 0, hint: "它的所有格是 Its (無撇號)。" },
+                { q: "Rick: Emma, is Amy ______ mother? Emma: No, she is not ______ mother.", opts: ["your; my", "your; your", "her; his", "your; her"], a: 0, hint: "對話對應：問『你的』答『我的』。" },
+                { q: "That is ______ desk.", opts: ["us", "I", "she", "her"], a: 3, hint: "名詞 desk 前需要所有格形容詞。" },
+                { q: "Today is ______ birthday.", opts: ["Tim", "Daisy's", "Helen", "he"], a: 1, hint: "名字後加 's 表示所有格。" },
+                { q: "These are the three ______ toy cars.", opts: ["a boy's", "boys'", "a boy", "boys"], a: 1, hint: "複數 s 結尾只需加 '。" },
+                { q: "Renee is ______ daughter. I'm ______ mother.", opts: ["my; her", "my; my", "her; her", "her; my"], a: 0, hint: "我是她的媽媽，她是我的女兒。" },
+                { q: "She is ______ mother. Chip and Ben are brothers.", opts: ["Chip's and Ben's", "Chip's and Ben", "Chip and Ben", "Chip and Ben's"], a: 3, hint: "共同擁有的媽媽，最後一個名字加 's。" },
+                { q: "Mary is my sister. = ______ is my sister.", opts: ["She", "He", "Her", "It"], a: 0, hint: "Mary 的主格代名詞。" },
+                { q: "We are students. Ms. Smith is ______ teacher.", opts: ["her", "our", "their", "your"], a: 1, hint: "We 對應 our。" },
+                { q: "Peter and Viper are brothers. Cinderella is ______ mother.", opts: ["she's", "their", "they're", "his"], a: 1, hint: "複數(他們)的所有格。" },
+                { q: "______ is our classmate. ______ name is Amanda.", opts: ["He; Her", "He; His", "She; Her", "Her; She"], a: 2, hint: "Amanda 是女生。" },
+                { q: "Is this pen ______? No, it's not mine.", opts: ["you", "your", "yours", "me"], a: 2, hint: "獨立使用的所有格代名詞。" },
+                { q: "Those books are ______. They are not his.", opts: ["they", "them", "their", "theirs"], a: 3, hint: "獨立使用的所有格代名詞。" }
+            ];
+
+            questions = [...manualQ];
+            const types = ['sub', 'obj', 'adj', 'pron'];
+            for(let i = questions.length; i < 100; i++) {
+                const row = pronounData[Math.floor(Math.random() * pronounData.length)];
+                const type = types[Math.floor(Math.random() * types.length)];
+                let qText, correct, hint;
+
+                if(type === 'sub') {
+                    qText = `(人稱：${row.person}) ______ like to play basketball.`;
+                    correct = row.sub; hint = `主格當句子的主詞。`;
+                } else if(type === 'obj') {
+                    qText = `The teacher likes (人稱：${row.person}) ______ very much.`;
+                    correct = row.obj; hint = `賓格放在動詞或介系詞後。`;
+                } else if(type === 'adj') {
+                    qText = `Is that (人稱：${row.person}) ______ magic book?`;
+                    correct = row.adj; hint = `所有格形容詞後面要有名詞。`;
+                } else {
+                    qText = `This wand is (人稱：${row.person}) ______.`;
+                    correct = row.pron; hint = `所有格代名詞 = 所有格形容詞 + 名詞。`;
+                }
+
+                let opts = [correct, "me", "their", "his", "yours"];
+                opts = [...new Set(opts)].filter(o => o !== correct).slice(0, 3);
+                opts.push(correct);
+                opts.sort(() => Math.random() - 0.5);
+
+                questions.push({
+                    q: qText,
+                    opts: opts,
+                    a: opts.indexOf(correct),
+                    hint: hint
+                });
+            }
+        }
+
+        function renderQuiz() {
+            const wrapper = document.getElementById('quiz-wrapper');
+            const q = questions[currentIndex];
+            const response = userResponses[currentIndex];
+
+            let html = `
+                <div class="quiz-card p-8 md:p-10 rounded-[2.5rem] border animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div class="mb-8">
+                        <span class="inline-block bg-purple-600/50 text-purple-200 px-4 py-1 rounded-full text-xs font-bold mb-4">題目編號 #${currentIndex + 1}</span>
+                        <h3 class="text-2xl md:text-3xl font-medium leading-relaxed">${q.q}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            `;
+
+            q.opts.forEach((opt, idx) => {
+                let statusClass = "";
+                let icon = '<i class="fas fa-magic opacity-0 group-hover:opacity-100 transition-opacity"></i>';
+                
+                if (response !== null) {
+                    if (idx === q.a) {
+                        statusClass = "option-correct";
+                        icon = '<i class="fas fa-check-circle"></i>';
+                    } else if (idx === response.selectedIdx && !response.isCorrect) {
+                        statusClass = "option-wrong";
+                        icon = '<i class="fas fa-times-circle"></i>';
+                    }
+                }
+
+                html += `
+                    <button onclick="handleSelect(${idx}, this)" 
+                            ${response !== null ? 'disabled' : ''}
+                            class="option-btn p-5 rounded-2xl text-left text-lg font-bold flex items-center justify-between group ${statusClass}">
+                        <span>${String.fromCharCode(65 + idx)}. ${opt}</span>
+                        ${icon}
+                    </button>
+                `;
+            });
+
+            html += `</div>`;
+            
+            if (response !== null) {
+                html += `
+                    <div class="mt-8 p-5 bg-white/5 rounded-2xl border border-white/10 flex items-start gap-4 animate-in zoom-in-95">
+                        <div class="text-yellow-400 text-xl pt-1"><i class="fas fa-lightbulb"></i></div>
+                        <div>
+                            <p class="font-bold text-yellow-400">解析筆記：</p>
+                            <p class="text-gray-300">${q.hint}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            wrapper.innerHTML = html;
+
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / 100`;
+            updatePagination();
+            updateStats();
+        }
+
+        function handleSelect(idx, btn) {
+            const q = questions[currentIndex];
+            const isCorrect = (idx === q.a);
+            
+            userResponses[currentIndex] = { selectedIdx: idx, isCorrect: isCorrect };
+            
+            if (isCorrect) {
+                magicSparkle(btn);
+            }
+
+            renderQuiz();
+            updateMistakeList();
+
+            if (isCorrect && currentIndex < 99) {
+                setTimeout(() => {
+                    currentIndex++;
+                    renderQuiz();
+                }, 1200);
+            }
+        }
+
+        function updatePagination() {
+            const grid = document.getElementById('pagination-grid');
+            grid.innerHTML = '';
+            
+            questions.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.innerText = i + 1;
+                let classes = "w-10 h-10 rounded-lg text-xs font-bold transition-all border border-white/10 ";
+                const res = userResponses[i];
+                if (res !== null) {
+                    classes += res.isCorrect ? "nav-btn-correct " : "nav-btn-wrong ";
+                } else {
+                    classes += "bg-white/5 hover:bg-white/20 ";
+                }
+                if (i === currentIndex) classes += "nav-btn-current ";
+                btn.className = classes;
+                btn.onclick = () => { currentIndex = i; renderQuiz(); };
+                grid.appendChild(btn);
+            });
+        }
+
+        function updateStats() {
+            const correctCount = userResponses.filter(r => r && r.isCorrect).length;
+            const wrongCount = userResponses.filter(r => r && !r.isCorrect).length;
+            document.getElementById('score').innerText = correctCount * 10;
+            document.getElementById('wrong-count').innerText = wrongCount;
+            document.getElementById('print-wrong-count').innerText = wrongCount;
+
+            if (userResponses.filter(r => r !== null).length === 100) {
+                showCelebration(correctCount);
+            }
+        }
+
+        function updateMistakeList() {
+            const list = document.getElementById('mistake-list');
+            const mistakes = userResponses.map((r, i) => r && !r.isCorrect ? i : null).filter(i => i !== null);
+
+            // 更新列印資訊
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString();
+            const nameInput = document.getElementById('student-name-input').value;
+            document.getElementById('print-student-name').innerText = nameInput || "未填寫";
+
+            if (mistakes.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 italic no-print">目前沒有錯題，保持下去！</p>';
+                return;
+            }
+
+            list.innerHTML = mistakes.map(idx => {
+                const q = questions[idx];
+                const res = userResponses[idx];
+                return `
+                    <div class="mistake-item bg-red-900/20 border border-red-500/20 p-6 rounded-xl flex flex-col gap-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-red-400 font-bold text-lg">題目 #${idx + 1}</span>
+                            <button onclick="goToQuestion(${idx})" class="no-print text-xs bg-red-500/20 hover:bg-red-500/40 px-3 py-1 rounded-lg transition-all">
+                                回去修正 <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="text-gray-200 text-xl print:text-black">
+                            <p class="font-medium">${q.q}</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm mt-2">
+                            <div class="bg-red-500/10 p-2 rounded print:border print:border-red-200">
+                                <span class="print-label text-red-400">你的回答：</span> 
+                                <span class="text-gray-300 print:text-black">${q.opts[res.selectedIdx]}</span>
+                            </div>
+                            <div class="bg-green-500/10 p-2 rounded print:border print:border-green-200">
+                                <span class="print-label text-green-400">正確答案：</span> 
+                                <span class="text-gray-300 print:text-black">${q.opts[q.a]}</span>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-400 italic print:text-gray-600">
+                            解析：${q.hint}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function goToQuestion(idx) {
+            currentIndex = idx;
+            document.getElementById('mistake-section').classList.add('hidden');
+            renderQuiz();
+            window.scrollTo({ top: document.querySelector('section.relative').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        function toggleMistakeSummary() {
+            const sec = document.getElementById('mistake-section');
+            sec.classList.toggle('hidden');
+            if(!sec.classList.contains('hidden')) {
+                updateMistakeList();
+                sec.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function magicSparkle(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 20; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                s.style.setProperty('--tx', `${tx}px`);
+                s.style.setProperty('--ty', `${ty}px`);
+                s.style.left = `${rect.left + rect.width / 2}px`;
+                s.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+                s.style.width = Math.random() * 8 + 4 + 'px';
+                s.style.height = s.style.width;
+                s.style.background = `hsl(${Math.random() * 60 + 40}, 100%, 70%)`;
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 800);
+            }
+        }
+
+        function showCelebration(correct) {
+            const modal = document.getElementById('celebration-modal');
+            const stats = document.getElementById('final-stats');
+            stats.innerHTML = `正確率：${correct}% <br> 獲得魔法積分：${correct * 10}`;
+            modal.classList.remove('hidden');
+        }
+
+        window.onload = () => {
+            generateQuestions();
+            renderQuiz();
+            
+            // 監聽姓名輸入更新列印區域
+            document.getElementById('student-name-input').addEventListener('input', (e) => {
+                document.getElementById('print-student-name').innerText = e.target.value || "未填寫";
+            });
+        };
+    </script>
+</body>
+</html>

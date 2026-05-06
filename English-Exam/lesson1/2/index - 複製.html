@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升私中特訓班 - 英語代名詞篇</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        :root {
+            --magic-purple: #6b46c1;
+            --magic-gold: #ecc94b;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .magic-font {
+            font-family: 'Nova Script', cursive;
+        }
+
+        .scroll-container {
+            background: #fdf5e6;
+            color: #4a3728;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 100px rgba(139, 69, 19, 0.2);
+            border: 8px solid #8b4513;
+            position: relative;
+        }
+
+        .scroll-container::before, .scroll-container::after {
+            content: '';
+            position: absolute;
+            height: 110%;
+            width: 40px;
+            background: #5d2906;
+            top: -5%;
+            border-radius: 20px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .scroll-container::before { left: -30px; }
+        .scroll-container::after { right: -30px; }
+
+        .pronoun-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pronoun-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 10px 20px rgba(107, 70, 193, 0.4);
+            border-color: var(--magic-purple);
+        }
+
+        .active-tab {
+            background-color: var(--magic-purple);
+            color: white;
+        }
+
+        .quiz-feedback {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: white;
+            border-radius: 50%;
+            animation: sparkleAnim 1s linear forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 頂部標題區 -->
+    <header class="text-center mb-12 relative">
+        <div class="inline-block relative">
+            <h1 class="text-4xl md:text-6xl font-bold magic-font text-yellow-400 mb-2 drop-shadow-[0_0_10px_rgba(236,201,75,0.8)]">
+                JingMing Magic
+            </h1>
+            <p class="text-xl md:text-2xl text-purple-300 font-bold">金名升私中特訓班：英語代名詞大挑戰</p>
+            <div class="absolute -top-6 -left-8 text-4xl animate-bounce">⚡</div>
+            <div class="absolute -bottom-2 -right-8 text-4xl animate-pulse">✨</div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-12">
+        
+        <!-- 魔法知識庫：代名詞表格 -->
+        <section id="knowledge-base" class="scroll-container p-6 md:p-10 mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold border-b-4 border-brown-600 pb-2">📜 魔法秘籍：代名詞對照表</h2>
+                <div class="hidden md:block bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-600 text-sm font-bold">
+                    點擊單字查看魔法例句
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-center border-collapse">
+                    <thead>
+                        <tr class="bg-amber-800 text-white">
+                            <th class="p-3 border">人稱</th>
+                            <th class="p-3 border">主格 (Subject)</th>
+                            <th class="p-3 border">賓格 (Object)</th>
+                            <th class="p-3 border">所有格形容詞 (Poss. Adj.)</th>
+                            <th class="p-3 border">所有格代名詞 (Poss. Pron.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pronounTableBody">
+                        <!-- 由 JS 動態生成內容 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="example-box" class="mt-8 p-4 bg-white/50 rounded-xl border-l-8 border-purple-600 hidden">
+                <p class="text-lg font-bold text-purple-900" id="example-text"></p>
+                <p class="text-gray-600 italic" id="example-translation"></p>
+            </div>
+        </section>
+
+        <!-- 魔法挑戰區 -->
+        <section class="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="bg-yellow-400 p-3 rounded-full text-blue-900 text-2xl">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <h2 class="text-3xl font-bold">填補咒語：實戰練習題</h2>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- 由 JS 動態生成練習題 -->
+            </div>
+
+            <div class="mt-8 flex justify-between items-center bg-black/30 p-4 rounded-xl">
+                <div class="text-xl">
+                    魔法能量值 (Score): <span id="score" class="text-yellow-400 font-bold">0</span>
+                </div>
+                <button onclick="resetQuiz()" class="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-full font-bold transition-all flex items-center gap-2">
+                    <i class="fas fa-undo"></i> 重啟挑戰
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-16 text-gray-400 text-sm">
+        <p>© 2026 金名升私中特訓班 - 英語特訓班 | 讓學習變得更簡單</p>
+    </footer>
+
+    <script>
+        const pronounData = [
+            { person: '第一人稱單數', sub: 'I', obj: 'me', adj: 'my', pron: 'mine', ex: 'I am a wizard. Give it to me.', trans: '我是一個巫師。把它給我。' },
+            { person: '第二人稱單數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours', ex: 'You have a wand. This is your wand.', trans: '你有一根魔杖。這是你的魔杖。' },
+            { person: '第三人稱單數 (男)', sub: 'He', obj: 'him', adj: 'his', pron: 'his', ex: 'He is strong. I like him.', trans: '他很強壯。我喜歡他。' },
+            { person: '第三人稱單數 (女)', sub: 'She', obj: 'her', adj: 'her', pron: 'hers', ex: 'She is smart. Her book is red.', trans: '她很聰明。她的書是紅色的。' },
+            { person: '第三人稱單數 (物)', sub: 'It', obj: 'it', adj: 'its', pron: 'its', ex: 'Look at the cat. Its tail is long.', trans: '看那隻貓。它的尾巴很長。' },
+            { person: '第一人稱複數', sub: 'We', obj: 'us', adj: 'our', pron: 'ours', ex: 'We are team. Join us!', trans: '我們是一個團隊。加入我們！' },
+            { person: '第三人稱複數', sub: 'They', obj: 'them', adj: 'their', pron: 'theirs', ex: 'They are students. Their house is big.', trans: '他們是學生。他們的房子很大。' }
+        ];
+
+        const quizData = [
+            { q: "This is not my hat. It is _______ (mine/yours).", a: "yours", hint: "這不是我的帽子，是你的。" },
+            { q: "Peter is my friend. I saw _______ (him/his) at school.", a: "him", hint: "我看到「他」(賓格)。" },
+            { q: "_______ (We/Us) are going to the classroom.", a: "We", hint: "「我們」是主詞。" },
+            { q: "The dog is wagging _______ (its/it's) tail.", a: "its", hint: "它的尾巴 (所有格)。" },
+            { q: "Can you help _______ (I/me) with the homework?", a: "me", hint: "你能幫助「我」(賓格)嗎？" }
+        ];
+
+        let currentScore = 0;
+
+        function initTable() {
+            const tbody = document.getElementById('pronounTableBody');
+            pronounData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-amber-50' : 'bg-white';
+                tr.innerHTML = `
+                    <td class="p-3 border font-bold text-amber-900">${row.person}</td>
+                    <td class="p-3 border hover:bg-yellow-200 cursor-pointer transition-colors" onclick="showExample('${row.ex}', '${row.trans}', this)">${row.sub}</td>
+                    <td class="p-3 border hover:bg-yellow-200 cursor-pointer transition-colors" onclick="showExample('${row.ex}', '${row.trans}', this)">${row.obj}</td>
+                    <td class="p-3 border hover:bg-yellow-200 cursor-pointer transition-colors" onclick="showExample('${row.ex}', '${row.trans}', this)">${row.adj}</td>
+                    <td class="p-3 border hover:bg-yellow-200 cursor-pointer transition-colors" onclick="showExample('${row.ex}', '${row.trans}', this)">${row.pron}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showExample(text, trans, el) {
+            const box = document.getElementById('example-box');
+            const exText = document.getElementById('example-text');
+            const exTrans = document.getElementById('example-translation');
+            
+            exText.innerText = "✨ Magic Example: " + text;
+            exTrans.innerText = "翻譯：" + trans;
+            box.classList.remove('hidden');
+            
+            createSparkles(el);
+        }
+
+        function createSparkles(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 8; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const tx = (Math.random() - 0.5) * 100;
+                const ty = (Math.random() - 0.5) * 100;
+                s.style.setProperty('--tx', `${tx}px`);
+                s.style.setProperty('--ty', `${ty}px`);
+                s.style.left = `${rect.left + rect.width / 2}px`;
+                s.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+                s.style.width = '10px';
+                s.style.height = '10px';
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 1000);
+            }
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            quizData.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-purple-400 transition-all group';
+                div.innerHTML = `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-purple-400 font-bold mr-2">Q${idx+1}.</span>
+                            <span class="text-lg">${item.q.replace('_______', `<input type="text" id="q${idx}" class="mx-2 bg-transparent border-b-2 border-yellow-400 outline-none w-24 text-center text-yellow-300 font-bold focus:border-white transition-all" placeholder="???">`)}</span>
+                        </div>
+                        <button onclick="checkAnswer(${idx})" id="btn${idx}" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold transition-all shrink-0">
+                            施放咒語 (Check)
+                        </button>
+                    </div>
+                    <p id="feedback${idx}" class="mt-3 hidden font-bold quiz-feedback"></p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function checkAnswer(idx) {
+            const input = document.getElementById(`q${idx}`);
+            const feedback = document.getElementById(`feedback${idx}`);
+            const btn = document.getElementById(`btn${idx}`);
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctAnswer = quizData[idx].a.toLowerCase();
+
+            feedback.classList.remove('hidden', 'text-green-400', 'text-red-400');
+            
+            if (userAnswer === correctAnswer) {
+                feedback.innerText = "✨ 太棒了！咒語正確！";
+                feedback.classList.add('text-green-400');
+                btn.classList.add('bg-green-600', 'pointer-events-none');
+                btn.innerText = "✔️ 已施放";
+                currentScore += 20;
+                updateScore();
+                createSparkles(input);
+            } else {
+                feedback.innerText = `❌ 咒語失敗... 提示：${quizData[idx].hint}`;
+                feedback.classList.add('text-red-400');
+                input.classList.add('border-red-500');
+                setTimeout(() => input.classList.remove('border-red-500'), 1000);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = currentScore;
+            if (currentScore >= 100) {
+                showCelebration();
+            }
+        }
+
+        function resetQuiz() {
+            currentScore = 0;
+            document.getElementById('score').innerText = '0';
+            initQuiz();
+        }
+
+        function showCelebration() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-gradient-to-br from-purple-900 to-indigo-900 p-10 rounded-3xl text-center border-4 border-yellow-400 max-w-md w-full animate-bounce">
+                    <h3 class="text-4xl font-bold text-yellow-400 mb-4">🏆 傳奇巫師！</h3>
+                    <p class="text-xl text-white mb-6">你已完美掌握金名升特訓班的代名詞魔法！</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-yellow-400 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transition-all">
+                        繼續挑戰
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        window.onload = () => {
+            initTable();
+            initQuiz();
+        };
+    </script>
+</body>
+</html>

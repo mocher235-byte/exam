@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升私中特訓班 - 代名詞與所有格魔導書</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        :root {
+            --magic-purple: #6b46c1;
+            --magic-gold: #ecc94b;
+            --magic-deep: #1a1a2e;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .magic-font {
+            font-family: 'Nova Script', cursive;
+        }
+
+        /* 羊皮紙卷軸樣式 */
+        .scroll-container {
+            background: #fdf5e6;
+            color: #4a3728;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.6), inset 0 0 100px rgba(139, 69, 19, 0.15);
+            border: 10px solid #8b4513;
+            position: relative;
+        }
+
+        .scroll-container::before, .scroll-container::after {
+            content: '';
+            position: absolute;
+            height: 115%;
+            width: 45px;
+            background: linear-gradient(to right, #5d2906, #8b4513, #5d2906);
+            top: -7.5%;
+            border-radius: 25px;
+            box-shadow: 5px 5px 20px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        .scroll-container::before { left: -35px; }
+        .scroll-container::after { right: -35px; }
+
+        .btn-magic {
+            background: linear-gradient(45deg, #6b46c1, #805ad5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(107, 70, 193, 0.4);
+        }
+
+        .btn-magic:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 70, 193, 0.6);
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-card:hover {
+            border-color: var(--magic-gold);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .option-btn {
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            background: rgba(236, 201, 75, 0.2);
+            border-color: var(--magic-gold);
+        }
+
+        .option-correct {
+            background: #2f855a !important;
+            border-color: #48bb78 !important;
+            color: white !important;
+        }
+
+        .option-wrong {
+            background: #9b2c2c !important;
+            border-color: #f56565 !important;
+            color: white !important;
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: #fff;
+            border-radius: 50%;
+            animation: sparkleAnim 0.8s linear forwards;
+            z-index: 100;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: translate(0,0) scale(1.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 自定義滾動條 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: #4a3728; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 頂部魔法標題 -->
+    <header class="text-center mb-16 relative">
+        <div class="inline-block relative">
+            <h1 class="text-5xl md:text-7xl font-bold magic-font text-yellow-400 mb-4 drop-shadow-[0_0_15px_rgba(236,201,75,0.8)] floating">
+                JingMing Magic Academy
+            </h1>
+            <div class="flex items-center justify-center gap-4">
+                <span class="h-1 w-12 bg-purple-500 rounded-full"></span>
+                <p class="text-xl md:text-2xl text-purple-300 font-bold tracking-widest">代名詞與所有格的終極試煉</p>
+                <span class="h-1 w-12 bg-purple-500 rounded-full"></span>
+            </div>
+            <div class="absolute -top-10 -left-12 text-5xl animate-pulse opacity-50">🔮</div>
+            <div class="absolute -bottom-5 -right-12 text-5xl animate-bounce opacity-50">📖</div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-20">
+        
+        <!-- 魔法知識庫：卷軸部分 -->
+        <section class="scroll-container p-8 md:p-12 mx-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                <div>
+                    <h2 class="text-4xl font-bold text-amber-900 mb-2">📜 奧義卷軸：代名詞對照表</h2>
+                    <p class="text-amber-800/70">掌握此表，便能操控基礎英語魔法。</p>
+                </div>
+                <div class="bg-amber-100 px-6 py-3 rounded-xl border-2 border-amber-600 text-amber-900 font-bold shadow-md">
+                    💡 點擊咒語聽取解析
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg shadow-inner bg-white/40 p-1">
+                <table class="w-full text-center border-collapse">
+                    <thead>
+                        <tr class="bg-amber-900 text-amber-50">
+                            <th class="p-4 border border-amber-800">人稱</th>
+                            <th class="p-4 border border-amber-800">主格 (動作發起)</th>
+                            <th class="p-4 border border-amber-800">賓格 (動作接受)</th>
+                            <th class="p-4 border border-amber-800">所有格形容詞 (+名詞)</th>
+                            <th class="p-4 border border-amber-800">所有格代名詞 (獨立使用)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pronounTableBody">
+                        <!-- JS 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 名詞所有格特別解析 -->
+            <div class="mt-12 p-6 bg-amber-900/10 rounded-2xl border-2 border-dashed border-amber-700">
+                <h3 class="text-2xl font-bold text-amber-900 mb-4"><i class="fas fa-hat-wizard mr-2"></i>名詞所有格魔法 (Apostrophe Rules)</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white/60 p-4 rounded-xl">
+                        <p class="font-bold text-purple-900">單數名詞：直接加 's</p>
+                        <p class="text-sm">範例：A boy's toy (一個男孩的玩具)</p>
+                    </div>
+                    <div class="bg-white/60 p-4 rounded-xl">
+                        <p class="font-bold text-purple-900">複數名詞 (s結尾)：只加 '</p>
+                        <p class="text-sm">範例：Three boys' toys (三個男孩們的玩具)</p>
+                    </div>
+                    <div class="bg-white/60 p-4 rounded-xl">
+                        <p class="font-bold text-purple-900">共同所有：A and B's</p>
+                        <p class="text-sm">範例：Chip and Ben's mother (共同的媽媽)</p>
+                    </div>
+                    <div class="bg-white/60 p-4 rounded-xl">
+                        <p class="font-bold text-purple-900">個別所有：A's and B's</p>
+                        <p class="text-sm">範例：Chip's and Ben's rooms (各自的房間)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 魔法試煉場 -->
+        <section class="relative">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 px-4">
+                <div class="flex items-center gap-4">
+                    <div class="bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center text-blue-900 text-3xl shadow-[0_0_20px_rgba(236,201,75,0.5)]">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-4xl font-bold">代名詞 100 題大考驗</h2>
+                        <p class="text-gray-400">目前進度：<span id="progress-text">1/100</span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6 bg-black/40 px-8 py-4 rounded-2xl border border-white/10">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-400 uppercase">魔法能量</p>
+                        <p id="score" class="text-3xl font-bold text-yellow-400">0</p>
+                    </div>
+                    <div class="h-10 w-px bg-white/20"></div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-400 uppercase">連擊數</p>
+                        <p id="streak" class="text-3xl font-bold text-purple-400">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 題目區域 -->
+            <div id="quiz-wrapper" class="min-h-[400px]">
+                <!-- JS 會在這裡動態渲染題目卡片 -->
+            </div>
+
+            <!-- 分頁導航 -->
+            <div class="mt-12 flex flex-wrap justify-center gap-2" id="pagination-container">
+                <!-- JS 動態生成分頁按鈕 -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-24 py-12 border-t border-white/10 text-gray-500">
+        <p class="text-lg mb-2">© 2026 金名升私中特訓班 - 英語魔導課程</p>
+        <p>「知識就是最強大的咒語」</p>
+    </footer>
+
+    <!-- 成功彈窗 -->
+    <div id="celebration-modal" class="fixed inset-0 bg-black/90 hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-indigo-900 via-purple-900 to-black p-12 rounded-[40px] border-4 border-yellow-400 text-center max-w-lg w-full relative overflow-hidden">
+            <div class="absolute inset-0 opacity-20 pointer-events-none">
+                <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+            </div>
+            <h3 class="text-5xl font-bold text-yellow-400 mb-6">🏆 傳奇大魔導師！</h3>
+            <p class="text-xl text-purple-200 mb-8">你已完美通關 100 道試煉，金名升代名詞魔法已被你徹底掌握！</p>
+            <button onclick="location.reload()" class="bg-yellow-400 text-black px-12 py-4 rounded-full font-bold text-xl hover:bg-yellow-300 transition-all shadow-xl">
+                重新修煉
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 核心數據 ---
+        const pronounData = [
+            { person: '第一人稱單數', sub: 'I', obj: 'me', adj: 'my', pron: 'mine' },
+            { person: '第二人稱單數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours' },
+            { person: '第三人稱單數(男)', sub: 'He', obj: 'him', adj: 'his', pron: 'his' },
+            { person: '第三人稱單數(女)', sub: 'She', obj: 'her', adj: 'her', pron: 'hers' },
+            { person: '第三人稱單數(物)', sub: 'It', obj: 'it', adj: 'its', pron: 'its' },
+            { person: '第一人稱複數', sub: 'We', obj: 'us', adj: 'our', pron: 'ours' },
+            { person: '第二人稱複數', sub: 'You', obj: 'you', adj: 'your', pron: 'yours' },
+            { person: '第三人稱複數', sub: 'They', obj: 'them', adj: 'their', pron: 'theirs' }
+        ];
+
+        // 題目生成 logic (包含圖片中的題目)
+        const baseQuestions = [
+            // 圖片二內容
+            { q: "______ is Vicky, and he is Kenny.", options: ["I", "You", "She", "Its"], a: 2, hint: "Vicky 是女生名，且主格當主詞。" },
+            { q: "______ is my sister. ______ name is Karen.", options: ["She; Her", "He; His", "He; Her", "Her; She"], a: 0, hint: "姊姊是女性，第一格主格，第二格所有格形容詞。" },
+            { q: "Aaron: What a cute puppy! \n Betty: ______ name is Lucky.", options: ["Its", "It's", "It", "It is"], a: 0, hint: "動物的所有格用 Its (它的)。" },
+            { q: "Rick: Emma, is Amy ______ mother? \n Emma: No, she is not ______ mother.", options: ["your; my", "your; your", "her; his", "your; her"], a: 0, hint: "問『你的』，答『我的』。" },
+            { q: "That is ______ desk.", options: ["us", "I", "she", "her"], a: 3, hint: "名詞前面用所有格形容詞。" },
+            { q: "Today is ______ birthday.", options: ["Tim", "Daisy's", "Helen", "he"], a: 1, hint: "某人的生日，名詞所有格加 's。" },
+            { q: "These are the three ______ toy cars.", options: ["a boy's", "boys'", "a boy", "boys"], a: 1, hint: "複數 s 結尾的名詞所有格只加 '。" },
+            { q: "Renee is ______ daughter. I'm ______ mother.", options: ["my; her", "my; my", "her; her", "her; my"], a: 0, hint: "Renee 是我的女兒，我是她的媽媽。" },
+            { q: "She is ______ mother. Chip and Ben are brothers.", options: ["Chip's and Ben's", "Chip's and Ben", "Chip and Ben", "Chip and Ben's"], a: 3, hint: "共同所有(同一個媽媽)只在最後一個名詞加 's。" },
+            // 圖片三內容
+            { q: "______ is our classmate. ______ name is Amanda.", options: ["He; Her", "He; His", "She; Her", "Her; She"], a: 2, hint: "Amanda 是女生。" },
+            { q: "Ken: ______ her name? \n Lana: Dorothy.", options: ["What's", "What", "Who's", "Who"], a: 0, hint: "問名字用 What is (What's)。" },
+            { q: "We are students in Class 123. Ms. Smith is ______ teacher.", options: ["her", "our", "their", "your"], a: 1, hint: "『我們』的老師。" },
+            { q: "Peter and Viper are brothers. Cinderella is ______ mother.", options: ["she's", "their", "they're", "his"], a: 1, hint: "『他們』的媽媽。" },
+            { q: "Mary is my sister. (改寫：She...)", options: ["She is my sister.", "She's Mary sister.", "Mary is her sister.", "Her sister is Mary."], a: 0, hint: "Mary 是女性單數，代名詞用 She。" },
+            { q: "He's David, and she's Maggie. (加入 name 改寫)", options: ["His name is David, and her name is Maggie.", "He name is David.", "His name David.", "Her name is David."], a: 0, hint: "主格轉所有格形容詞。" }
+        ];
+
+        // 自動生成其餘題目達到 100 題
+        let allQuestions = [...baseQuestions];
+        const pronTypes = ['sub', 'obj', 'adj', 'pron'];
+        
+        for (let i = allQuestions.length; i < 100; i++) {
+            const randomRow = pronounData[Math.floor(Math.random() * pronounData.length)];
+            const type = pronTypes[Math.floor(Math.random() * pronTypes.length)];
+            let qText = "";
+            let correct = "";
+            let opts = [];
+
+            if(type === 'sub') {
+                qText = `______ like English very much. (以${randomRow.person}填空)`;
+                correct = randomRow.sub;
+            } else if(type === 'obj') {
+                qText = `Please tell ______ the truth. (對象是${randomRow.person})`;
+                correct = randomRow.obj;
+            } else if(type === 'adj') {
+                qText = `This is ______ magic wand. (屬於${randomRow.person}的)`;
+                correct = randomRow.adj;
+            } else {
+                qText = `The golden book is ______. (那是${randomRow.person}的東西)`;
+                correct = randomRow.pron;
+            }
+
+            opts = [correct, "me", "their", "his"];
+            opts = [...new Set(opts)]; // 移除重複
+            while(opts.length < 4) opts.push("yours");
+            opts.sort(() => Math.random() - 0.5);
+
+            allQuestions.push({
+                q: qText,
+                options: opts,
+                a: opts.indexOf(correct),
+                hint: `這是${randomRow.person}的${type === 'sub' ? '主格' : type === 'obj' ? '賓格' : '所有格'}`
+            });
+        }
+
+        // --- 狀態管理 ---
+        let currentScore = 0;
+        let currentStreak = 0;
+        let currentPage = 0;
+        const questionsPerPage = 1; // 一次顯示一題
+
+        // --- 初始化界面 ---
+        function initTable() {
+            const tbody = document.getElementById('pronounTableBody');
+            pronounData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-amber-50/50' : 'bg-white/50';
+                tr.innerHTML = `
+                    <td class="p-4 border border-amber-200 font-bold text-amber-900">${row.person}</td>
+                    <td class="p-4 border border-amber-200 hover:bg-yellow-200 cursor-help transition-colors" onclick="magicSparkle(this)">${row.sub}</td>
+                    <td class="p-4 border border-amber-200 hover:bg-yellow-200 cursor-help transition-colors" onclick="magicSparkle(this)">${row.obj}</td>
+                    <td class="p-4 border border-amber-200 hover:bg-yellow-200 cursor-help transition-colors" onclick="magicSparkle(this)">${row.adj}</td>
+                    <td class="p-4 border border-amber-200 hover:bg-yellow-200 cursor-help transition-colors" onclick="magicSparkle(this)">${row.pron}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderQuiz() {
+            const wrapper = document.getElementById('quiz-wrapper');
+            wrapper.innerHTML = '';
+            
+            const start = currentPage * questionsPerPage;
+            const end = start + questionsPerPage;
+            const q = allQuestions[start];
+
+            const card = document.createElement('div');
+            card.className = 'quiz-card p-8 md:p-12 rounded-[2rem] border shadow-2xl animate-in fade-in duration-700';
+            card.innerHTML = `
+                <div class="mb-10">
+                    <span class="inline-block bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-bold mb-4">咒語 Q${start + 1}</span>
+                    <h3 class="text-2xl md:text-3xl font-medium leading-relaxed">${q.q.replace(/\n/g, '<br>')}</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${q.options.map((opt, idx) => `
+                        <button onclick="checkAnswer(${idx}, this)" class="option-btn p-5 rounded-2xl text-left text-lg font-bold flex items-center justify-between group">
+                            <span>${String.fromCharCode(65 + idx)}. ${opt}</span>
+                            <i class="fas fa-magic opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </button>
+                    `).join('')}
+                </div>
+                <div id="hint-box" class="mt-8 p-4 bg-yellow-400/10 border border-yellow-400/30 rounded-xl hidden">
+                    <p class="text-yellow-200"><i class="fas fa-lightbulb mr-2"></i>精靈提示：${q.hint}</p>
+                </div>
+            `;
+            wrapper.appendChild(card);
+            document.getElementById('progress-text').innerText = `${start + 1} / 100`;
+            updatePagination();
+        }
+
+        function checkAnswer(selectedIdx, btn) {
+            const q = allQuestions[currentPage];
+            const allBtns = btn.parentElement.querySelectorAll('button');
+            
+            // 禁用所有按鈕
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+            if (selectedIdx === q.a) {
+                // 正確
+                btn.classList.add('option-correct');
+                currentScore += 10 + (currentStreak * 2);
+                currentStreak++;
+                magicSparkle(btn);
+                
+                setTimeout(() => {
+                    if (currentPage < 99) {
+                        currentPage++;
+                        renderQuiz();
+                    } else {
+                        showCelebration();
+                    }
+                }, 1000);
+            } else {
+                // 錯誤
+                btn.classList.add('option-wrong');
+                allBtns[q.a].classList.add('option-correct');
+                document.getElementById('hint-box').classList.remove('hidden');
+                currentStreak = 0;
+                
+                // 震動效果
+                btn.parentElement.parentElement.classList.add('animate-bounce');
+                setTimeout(() => btn.parentElement.parentElement.classList.remove('animate-bounce'), 500);
+
+                // 兩秒後換下一題
+                setTimeout(() => {
+                    if (currentPage < 99) {
+                        currentPage++;
+                        renderQuiz();
+                    }
+                }, 2500);
+            }
+            
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score').innerText = currentScore;
+            document.getElementById('streak').innerText = currentStreak;
+        }
+
+        function updatePagination() {
+            const container = document.getElementById('pagination-container');
+            container.innerHTML = '';
+            
+            // 只顯示當前頁面附近的按鈕
+            let range = 2;
+            for (let i = 0; i < 100; i++) {
+                if (i === 0 || i === 99 || (i >= currentPage - range && i <= currentPage + range)) {
+                    const pBtn = document.createElement('button');
+                    pBtn.innerText = i + 1;
+                    pBtn.className = `w-10 h-10 rounded-lg font-bold transition-all ${i === currentPage ? 'bg-yellow-400 text-black scale-110 shadow-lg' : 'bg-white/10 hover:bg-white/20 text-gray-400'}`;
+                    pBtn.onclick = () => {
+                        currentPage = i;
+                        renderQuiz();
+                    };
+                    container.appendChild(pBtn);
+                } else if (i === currentPage - range - 1 || i === currentPage + range + 1) {
+                    const span = document.createElement('span');
+                    span.innerText = '...';
+                    span.className = 'text-gray-600 px-2';
+                    container.appendChild(span);
+                }
+            }
+        }
+
+        function magicSparkle(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 15; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const tx = (Math.random() - 0.5) * 150;
+                const ty = (Math.random() - 0.5) * 150;
+                s.style.setProperty('--tx', `${tx}px`);
+                s.style.setProperty('--ty', `${ty}px`);
+                s.style.left = `${rect.left + rect.width / 2}px`;
+                s.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+                s.style.width = Math.random() * 8 + 4 + 'px';
+                s.style.height = s.style.width;
+                s.style.background = `hsl(${Math.random() * 60 + 40}, 100%, 70%)`;
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 800);
+            }
+        }
+
+        function showCelebration() {
+            document.getElementById('celebration-modal').classList.remove('hidden');
+        }
+
+        window.onload = () => {
+            initTable();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金名升私中特訓班 - 所有格進階魔法篇</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Nova+Script&display=swap');
+
+        :root {
+            --magic-purple: #6b46c1;
+            --magic-gold: #ecc94b;
+            --scroll-bg: #fdf5e6;
+            --scroll-border: #8b4513;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .magic-font {
+            font-family: 'Nova Script', cursive;
+        }
+
+        .scroll-container {
+            background: var(--scroll-bg);
+            color: #4a3728;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 100px rgba(139, 69, 19, 0.2);
+            border: 8px solid var(--scroll-border);
+            position: relative;
+        }
+
+        .scroll-container::before, .scroll-container::after {
+            content: '';
+            position: absolute;
+            height: 110%;
+            width: 40px;
+            background: #5d2906;
+            top: -5%;
+            border-radius: 20px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .scroll-container::before { left: -30px; }
+        .scroll-container::after { right: -30px; }
+
+        .magic-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .magic-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--magic-gold);
+            box-shadow: 0 10px 20px rgba(236, 201, 75, 0.2);
+        }
+
+        .tip-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            color: #856404;
+        }
+
+        .quiz-feedback {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0__ { transform: scale(0); opacity: 0; }
+            100__ { transform: scale(1); opacity: 1; }
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: white;
+            border-radius: 50%;
+            animation: sparkleAnim 1s linear forwards;
+        }
+
+        @keyframes sparkleAnim {
+            0__ { transform: translate(0,0) scale(1); opacity: 1; }
+            100__ { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        select:focus {
+            box-shadow: 0 0 15px rgba(236, 201, 75, 0.5);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 頂部標題區 -->
+    <header class="text-center mb-12 relative">
+        <div class="inline-block relative">
+            <h1 class="text-4xl md:text-6xl font-bold magic-font text-yellow-400 mb-2 drop-shadow-[0_0_10px_rgba(236,201,75,0.8)]">
+                JingMing Magic
+            </h1>
+            <p class="text-xl md:text-2xl text-purple-300 font-bold">所有格進階魔法：個別、共同與禁止連用法</p>
+            <div class="absolute -top-6 -left-8 text-4xl animate-bounce">🔮</div>
+            <div class="absolute -bottom-2 -right-8 text-4xl animate-pulse">📜</div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-12">
+        
+        <!-- 魔法秘籍一：個別與共同所有 -->
+        <section class="scroll-container p-6 md:p-10 mx-4">
+            <div class="flex items-center gap-4 mb-6">
+                <h2 class="text-3xl font-bold border-b-4 border-amber-900 pb-2">📜 魔法秘籍 (一)：所有權的秘密</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white/60 p-5 rounded-xl border-2 border-amber-200">
+                    <h3 class="text-xl font-bold text-amber-900 mb-3"><i class="fas fa-users"></i> 共同所有 (Joint)</h3>
+                    <p class="mb-2">當 A 和 B 共同擁有某樣事物時：</p>
+                    <div class="bg-amber-800 text-white p-3 rounded-lg text-center font-mono text-xl mb-3">
+                        A and B's
+                    </div>
+                    <p class="text-sm text-amber-800 italic">例句：Jenny and Mandy's dad is a cook.<br>(兩姊妹的爸爸是同一個)</p>
+                </div>
+
+                <div class="bg-white/60 p-5 rounded-xl border-2 border-amber-200">
+                    <h3 class="text-xl font-bold text-amber-900 mb-3"><i class="fas fa-user-friends"></i> 個別所有 (Individual)</h3>
+                    <p class="mb-2">當 A 和 B 分別擁有不同的事物時：</p>
+                    <div class="bg-amber-800 text-white p-3 rounded-lg text-center font-mono text-xl mb-3">
+                        A's and B's
+                    </div>
+                    <p class="text-sm text-amber-800 italic">例句：Jenny's and Mandy's dads are cooks.<br>(她們各自的爸爸是不同人)</p>
+                </div>
+            </div>
+
+            <div class="tip-box mt-6 p-4 rounded-lg flex items-center gap-3">
+                <i class="fas fa-lightbulb text-2xl"></i>
+                <p class="font-bold">魔法提示：一個 's 就是一個～ (共同所有只有一個 's，個別所有則要有兩個 's)</p>
+            </div>
+        </section>
+
+        <!-- 魔法秘籍二：三選一禁忌 -->
+        <section class="bg-indigo-900/40 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10 text-8xl"><i class="fas fa-ban"></i></div>
+            
+            <div class="flex items-center gap-4 mb-8">
+                <div class="bg-red-500 p-3 rounded-full text-white text-2xl">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-white">所有格連用禁忌</h2>
+            </div>
+
+            <div class="bg-white/10 p-6 rounded-2xl border border-white/20">
+                <p class="text-xl mb-4 leading-relaxed">
+                    所有格不可與 <span class="text-yellow-400 font-bold underline">冠詞 (a, an, the)</span> 和 <span class="text-yellow-400 font-bold underline">指示形容詞 (this, that)</span> 連用。
+                </p>
+                
+                <div class="grid md:grid-cols-3 gap-4 text-center">
+                    <div class="p-4 bg-red-500/20 rounded-xl border border-red-500/50">
+                        <p class="line-through text-gray-400 italic">My a pen</p>
+                        <p class="text-green-400 font-bold">My pen</p>
+                    </div>
+                    <div class="p-4 bg-red-500/20 rounded-xl border border-red-500/50">
+                        <p class="line-through text-gray-400 italic">This a bicycle</p>
+                        <p class="text-green-400 font-bold">This bicycle</p>
+                    </div>
+                    <div class="p-4 bg-red-500/20 rounded-xl border border-red-500/50">
+                        <p class="line-through text-gray-400 italic">His that watch</p>
+                        <p class="text-green-400 font-bold">That watch</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-yellow-400 text-blue-900 p-4 rounded-xl text-center font-bold text-2xl animate-pulse">
+                    ✨ 魔法口訣：冠所指三選一 ✨
+                </div>
+            </div>
+        </section>
+
+        <!-- 魔法實戰挑戰區 -->
+        <section class="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="bg-yellow-400 p-3 rounded-full text-blue-900 text-2xl">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <h2 class="text-3xl font-bold">填補咒語：進階實戰練習</h2>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- 由 JS 動態生成練習題 -->
+            </div>
+
+            <div class="mt-8 flex justify-between items-center bg-black/30 p-4 rounded-xl">
+                <div class="text-xl">
+                    魔法能量值 (Score): <span id="score" class="text-yellow-400 font-bold">0</span>
+                </div>
+                <button onclick="resetQuiz()" class="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-full font-bold transition-all flex items-center gap-2">
+                    <i class="fas fa-undo"></i> 重啟挑戰
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-16 text-gray-400 text-sm">
+        <p>© 2026 金名升私中特訓班 - 英語特訓班 | 讓學習變得更簡單</p>
+    </footer>
+
+    <script>
+        const quizData = [
+            { 
+                q: "Jenny and Mandy's _______ is a cook.", 
+                options: ["dad", "dads"],
+                a: "dad", 
+                hint: "共同擁有，所以只有一個爸爸。" 
+            },
+            { 
+                q: "Jenny's and Mandy's dads _______ cooks.", 
+                options: ["is", "are"],
+                a: "are", 
+                hint: "個別所有，兩個人的爸爸共有兩位，所以用複數。" 
+            },
+            { 
+                q: "I want to buy _______ new CD album. (共同所有)", 
+                options: ["Zony and Yony", "Zony's and Yony", "Zony and Yony's", "Zony's and Yony's"],
+                a: "Zony and Yony's"
+            },
+            { 
+                q: "John's and Peter's _______ are dirty.", 
+                options: ["jacket", "jackets"],
+                a: "jackets", 
+                hint: "兩個人「各自的」外套，所以是複數。" 
+            },
+            { 
+                q: "改正句子：My a pen is under the ruler. -> (修正後) _______ is under the ruler.", 
+                options: ["My a pen", "My pen", "The my pen", "A pen"],
+                a: "My pen", 
+                hint: "冠所指三選一，不要連用！" 
+            },
+            {
+                q: "I want to buy _______ new CD albums. (個別所有)",
+                options: ["Jay and Jolin", "Jay's and Jolin", "Jay and Jolin's", "Jay's and Jolin's"],
+                a: "Jay's and Jolin's"
+            }
+        ];
+
+        let currentScore = 0;
+        let answeredQuestions = new Set();
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            answeredQuestions.clear();
+            quizData.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-purple-400 transition-all group';
+                
+                const selectHtml = `
+                    <select id="q${idx}" class="mx-2 bg-indigo-900 text-yellow-300 border-b-2 border-yellow-400 outline-none p-1 rounded font-bold cursor-pointer transition-all">
+                        <option value="">請選擇咒語...</option>
+                        ${item.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>
+                `;
+
+                div.innerHTML = `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <span class="text-purple-400 font-bold mr-2">Q${idx+1}.</span>
+                            <span class="text-lg leading-loose">${item.q.replace('_______', selectHtml)}</span>
+                        </div>
+                        <button onclick="checkAnswer(${idx})" id="btn${idx}" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold transition-all shrink-0">
+                            施放咒語 (Check)
+                        </button>
+                    </div>
+                    <p id="feedback${idx}" class="mt-3 hidden font-bold quiz-feedback"></p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function checkAnswer(idx) {
+            const select = document.getElementById(`q${idx}`);
+            const feedback = document.getElementById(`feedback${idx}`);
+            const btn = document.getElementById(`btn${idx}`);
+            const userAnswer = select.value;
+            const correctAnswer = quizData[idx].a;
+
+            if (userAnswer === "") {
+                feedback.innerText = "⚠️ 請先選擇一個咒語！";
+                feedback.className = "mt-3 font-bold text-yellow-400";
+                feedback.classList.remove('hidden');
+                return;
+            }
+
+            feedback.classList.remove('hidden', 'text-green-400', 'text-red-400', 'text-yellow-400');
+            
+            if (userAnswer === correctAnswer) {
+                feedback.innerText = "✨ 太棒了！魔力湧現，答案正確！";
+                feedback.classList.add('text-green-400');
+                btn.classList.remove('bg-amber-600', 'hover:bg-amber-500');
+                btn.classList.add('bg-green-600', 'pointer-events-none');
+                btn.innerText = "✔️ 已解除咒語";
+                select.disabled = true;
+                select.classList.add('opacity-70');
+                
+                if (!answeredQuestions.has(idx)) {
+                    answeredQuestions.add(idx);
+                    currentScore += Math.ceil(100 / quizData.length);
+                    updateScore();
+                }
+                createSparkles(select);
+            } else {
+                feedback.innerText = `❌ 魔法能量不穩定... 提示：${quizData[idx].hint || '再觀察一下題目喔！'}`;
+                feedback.classList.add('text-red-400');
+                select.classList.add('border-red-500');
+                setTimeout(() => select.classList.remove('border-red-500'), 1000);
+            }
+        }
+
+        function createSparkles(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 12; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                s.style.setProperty('--tx', `${tx}px`);
+                s.style.setProperty('--ty', `${ty}px`);
+                s.style.left = `${rect.left + rect.width / 2}px`;
+                s.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+                s.style.width = '10px';
+                s.style.height = '10px';
+                s.style.background = '#ecc94b';
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 1000);
+            }
+        }
+
+        function updateScore() {
+            const scoreEl = document.getElementById('score');
+            if (currentScore > 100) currentScore = 100;
+            scoreEl.innerText = currentScore;
+            if (currentScore >= 100) {
+                showCelebration();
+            }
+        }
+
+        function resetQuiz() {
+            currentScore = 0;
+            document.getElementById('score').innerText = '0';
+            initQuiz();
+        }
+
+        function showCelebration() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm';
+            modal.innerHTML = `
+                <div class="bg-gradient-to-br from-purple-900 to-indigo-900 p-10 rounded-3xl text-center border-4 border-yellow-400 max-w-md w-full shadow-[0_0_50px_rgba(236,201,75,0.5)] animate-bounce">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-4xl font-bold text-yellow-400 mb-4">語法大導師！</h3>
+                    <p class="text-xl text-white mb-6">你已完美避開所有權的陷阱，成功掌握了所有格魔法！</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-yellow-400 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transform hover:scale-105 transition-all shadow-lg">
+                        繼續探索
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        window.onload = () => {
+            initQuiz();
+        };
+    </script>
+</body>
+</html>
