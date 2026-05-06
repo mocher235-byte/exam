@@ -16,7 +16,15 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            RecaptchaVerifier, 
+            signInWithPhoneNumber,
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -36,7 +44,16 @@
         window.magicAcademy = { 
             auth, 
             db, 
-            actions: { signInAnonymously, onAuthStateChanged, signOut, doc, onSnapshot } 
+            actions: { 
+                GoogleAuthProvider, 
+                signInWithPopup, 
+                RecaptchaVerifier, 
+                signInWithPhoneNumber,
+                onAuthStateChanged, 
+                signOut, 
+                doc, 
+                onSnapshot 
+            } 
         };
     </script>
 
@@ -54,11 +71,11 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
         const LucideIcons = window.lucide || window.LucideReact || {};
         const { 
             Sparkles, Lock, LogOut, ChevronRight, Loader2, Diamond, Zap, 
-            Scroll, Wand2 
+            Scroll, Wand2, Phone, Mail, ShieldCheck, X
         } = LucideIcons;
 
         const SafeIcon = ({ icon: Icon, ...props }) => Icon ? <Icon {...props} /> : null;
@@ -68,7 +85,13 @@
             const [loading, setLoading] = useState(true);
             const [authLoading, setAuthLoading] = useState(false);
             const [permissions, setPermissions] = useState({ chinese: false, math: false, english: false });
-            const [showModal, setShowModal] = useState(null);
+            const [showModal, setShowModal] = useState(null); // 'login', 'buy', 'phone'
+            
+            // 電話登入相關
+            const [phoneNumber, setPhoneNumber] = useState('+886');
+            const [verificationCode, setVerificationCode] = useState('');
+            const [confirmationResult, setConfirmationResult] = useState(null);
+            const recaptchaRef = useRef(null);
 
             useEffect(() => {
                 const checkFirebase = setInterval(() => {
@@ -79,6 +102,7 @@
                         actions.onAuthStateChanged(auth, (currentUser) => {
                             setUser(currentUser);
                             if (currentUser) {
+                                setShowModal(null);
                                 const docRef = actions.doc(db, "artifacts", "jingming-magic-academy", "users", currentUser.uid, "profile", "data");
                                 actions.onSnapshot(docRef, (docSnap) => {
                                     if (docSnap.exists()) {
@@ -96,13 +120,57 @@
                 }, 100);
             }, []);
 
-            const handleLogin = async () => {
+            // Google 登入邏輯
+            const handleGoogleLogin = async () => {
                 if (!window.magicAcademy) return;
                 setAuthLoading(true);
                 try {
-                    await window.magicAcademy.actions.signInAnonymously(window.magicAcademy.auth);
-                } catch (e) { console.error(e); }
-                finally { setAuthLoading(false); }
+                    const { auth, actions } = window.magicAcademy;
+                    const provider = new actions.GoogleAuthProvider();
+                    await actions.signInWithPopup(auth, provider);
+                } catch (e) { 
+                    console.error("Google 登入失敗:", e);
+                    alert("Google 登入失敗，請確認是否已將此網域加入 Firebase 的授權網域清單。");
+                } finally { 
+                    setAuthLoading(false); 
+                }
+            };
+
+            // 電話登入 - 發送驗證碼
+            const handleSendOTP = async () => {
+                if (!window.magicAcademy || !phoneNumber) return;
+                setAuthLoading(true);
+                try {
+                    const { auth, actions } = window.magicAcademy;
+                    if (!window.recaptchaVerifier) {
+                        window.recaptchaVerifier = new actions.RecaptchaVerifier(auth, 'recaptcha-container', {
+                            'size': 'invisible'
+                        });
+                    }
+                    const result = await actions.signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+                    setConfirmationResult(result);
+                    setShowModal('phone_verify');
+                } catch (e) {
+                    console.error("發送簡訊失敗:", e);
+                    alert("簡訊發送失敗，請確認號碼格式正確（如 +886912345678）。");
+                } finally {
+                    setAuthLoading(false);
+                }
+            };
+
+            // 電話登入 - 驗證代碼
+            const handleVerifyOTP = async () => {
+                if (!confirmationResult || !verificationCode) return;
+                setAuthLoading(true);
+                try {
+                    await confirmationResult.confirm(verificationCode);
+                    setShowModal(null);
+                } catch (e) {
+                    console.error("驗證失敗:", e);
+                    alert("驗證碼錯誤，請重新輸入。");
+                } finally {
+                    setAuthLoading(false);
+                }
             };
 
             const handleLogout = () => window.magicAcademy?.actions.signOut(window.magicAcademy.auth);
@@ -117,6 +185,8 @@
 
             return (
                 <div className="min-h-screen flex flex-col">
+                    <div id="recaptcha-container"></div>
+                    
                     <nav className="bg-[#0f1225]/95 backdrop-blur-md sticky top-0 z-40 border-b border-amber-900/30">
                         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -125,12 +195,15 @@
                             </div>
                             {user ? (
                                 <div className="flex items-center gap-4">
-                                    <span className="hidden md:block text-[10px] text-gray-500 font-mono">ID: {user.uid.substring(0,8)}...</span>
-                                    <button onClick={handleLogout} className="p-2.5 text-gray-400 hover:text-red-400 transition-colors bg-white/5 rounded-full"><SafeIcon icon={LogOut} size={20} /></button>
+                                    <div className="hidden md:flex flex-col items-end">
+                                        <span className="text-[10px] text-amber-500 font-bold uppercase tracking-widest">魔法學員已認證</span>
+                                        <span className="text-[10px] text-gray-500 font-mono">{user.email || user.phoneNumber || '已登入'}</span>
+                                    </div>
+                                    <button onClick={handleLogout} className="p-2.5 text-gray-400 hover:text-red-400 transition-colors bg-white/5 rounded-full border border-white/5"><SafeIcon icon={LogOut} size={20} /></button>
                                 </div>
                             ) : (
-                                <button onClick={handleLogin} disabled={authLoading} className="border-2 border-amber-500/50 text-amber-400 px-8 py-2 rounded-full font-black hover:bg-amber-500/10 transition-all text-sm tracking-widest flex items-center gap-2">
-                                    {authLoading && <SafeIcon icon={Loader2} className="loader-spin w-4 h-4" />}學院登入
+                                <button onClick={() => setShowModal('login')} className="border-2 border-amber-500/50 text-amber-400 px-8 py-2 rounded-full font-black hover:bg-amber-500/10 transition-all text-sm tracking-widest flex items-center gap-2">
+                                    學院登入
                                 </button>
                             )}
                         </div>
@@ -142,7 +215,7 @@
                                 <SafeIcon icon={Diamond} size={16} className="text-amber-400" /><span className="text-xs font-black tracking-widest text-amber-200 uppercase">認真讀書 • 領取高額寶石卡獎勵</span>
                             </div>
                             <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight text-white">挑戰私中入學<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 italic">魔法特訓門戶</span></h1>
-                            <p className="text-gray-400 max-w-2xl mx-auto font-medium">金名文理補習班專用魔法教材。認真讀書，成就魔法未來。</p>
+                            <p className="text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">金名文理補習班專用魔法教材。認真讀書，成就魔法未來。</p>
                         </div>
                     </header>
 
@@ -163,14 +236,104 @@
                         ))}
                     </main>
 
+                    {/* 登入選項 Modal */}
+                    {showModal === 'login' && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md">
+                            <div className="bg-[#1a1f3c] border border-amber-500/40 rounded-[3rem] max-w-sm w-full p-10 text-center relative shadow-2xl">
+                                <button onClick={() => setShowModal(null)} className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"><SafeIcon icon={X} size={24} /></button>
+                                <div className="bg-amber-500/20 w-20 h-20 rounded-full flex items-center justify-center text-amber-400 mx-auto mb-8"><SafeIcon icon={ShieldCheck} size={40} /></div>
+                                <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-widest">魔法學員認證</h3>
+                                <p className="text-gray-400 text-sm mb-10 font-medium">請選擇您的認證方式以同步修煉進度</p>
+                                
+                                <div className="space-y-4">
+                                    {/* Google 優先 */}
+                                    <button 
+                                        onClick={handleGoogleLogin}
+                                        disabled={authLoading}
+                                        className="w-full bg-white text-gray-900 py-4 rounded-2xl font-black text-sm tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-amber-400 transition-all shadow-xl shadow-white/5 active:scale-95"
+                                    >
+                                        {authLoading ? <SafeIcon icon={Loader2} className="loader-spin w-5 h-5" /> : <SafeIcon icon={Mail} size={20} />}
+                                        使用 Google 帳號登入
+                                    </button>
+
+                                    <div className="flex items-center gap-4 py-2">
+                                        <div className="h-px bg-white/10 flex-grow"></div>
+                                        <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">或者</span>
+                                        <div className="h-px bg-white/10 flex-grow"></div>
+                                    </div>
+
+                                    {/* 電話次之 */}
+                                    <button 
+                                        onClick={() => setShowModal('phone_input')}
+                                        className="w-full bg-white/5 text-amber-400 py-4 rounded-2xl font-black text-sm tracking-widest border border-amber-500/20 uppercase flex items-center justify-center gap-3 hover:bg-white/10 transition-all active:scale-95"
+                                    >
+                                        <SafeIcon icon={Phone} size={20} />
+                                        使用手機號碼登入
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 電話號碼輸入 Modal */}
+                    {showModal === 'phone_input' && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md">
+                            <div className="bg-[#1a1f3c] border border-amber-500/40 rounded-[3rem] max-w-sm w-full p-10 text-center relative shadow-2xl">
+                                <button onClick={() => setShowModal('login')} className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"><SafeIcon icon={X} size={24} /></button>
+                                <h3 className="text-xl font-black text-white mb-8 tracking-widest">輸入手機號碼</h3>
+                                <input 
+                                    type="text" 
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    placeholder="+886912345678"
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-center text-white font-mono tracking-widest mb-8 focus:border-amber-400 outline-none transition-all"
+                                />
+                                <button 
+                                    onClick={handleSendOTP}
+                                    disabled={authLoading}
+                                    className="w-full bg-amber-500 text-[#0a0c1b] py-4 rounded-2xl font-black text-sm tracking-widest uppercase hover:brightness-110 transition-all shadow-xl shadow-amber-900/20 flex items-center justify-center gap-2"
+                                >
+                                    {authLoading && <SafeIcon icon={Loader2} className="loader-spin w-4 h-4" />}
+                                    發送驗證簡訊
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 簡訊驗證碼輸入 Modal */}
+                    {showModal === 'phone_verify' && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md">
+                            <div className="bg-[#1a1f3c] border border-emerald-500/40 rounded-[3rem] max-w-sm w-full p-10 text-center relative shadow-2xl">
+                                <h3 className="text-xl font-black text-white mb-8 tracking-widest italic text-emerald-400">請輸入 6 位魔法代碼</h3>
+                                <input 
+                                    type="text" 
+                                    value={verificationCode}
+                                    onChange={(e) => setVerificationCode(e.target.value)}
+                                    placeholder="123456"
+                                    className="w-full bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-center text-emerald-400 font-mono text-2xl tracking-[0.5em] mb-8 focus:border-emerald-400 outline-none transition-all"
+                                />
+                                <button 
+                                    onClick={handleVerifyOTP}
+                                    disabled={authLoading}
+                                    className="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-sm tracking-widest uppercase hover:brightness-110 transition-all shadow-xl shadow-emerald-900/20 flex items-center justify-center gap-2"
+                                >
+                                    {authLoading && <SafeIcon icon={Loader2} className="loader-spin w-4 h-4" />}
+                                    確認認證
+                                </button>
+                                <button onClick={() => setShowModal('phone_input')} className="mt-6 text-[10px] text-gray-500 hover:text-white uppercase font-black tracking-widest">號碼錯誤？重新輸入</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 購買提示 Modal */}
                     {showModal === 'buy' && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md">
-                            <div className="bg-[#1a1f3c] border border-amber-500/40 rounded-[3.5rem] max-w-md w-full p-12 text-center">
-                                <div className="bg-amber-500/20 w-28 h-28 rounded-full flex items-center justify-center text-amber-400 mx-auto mb-10"><SafeIcon icon={Wand2} size={56} /></div>
-                                <h3 className="text-3xl font-black text-amber-100 mb-6">開啟魔法大門</h3>
-                                <p className="text-gray-400 mb-12">購買科目後即可<span className="text-amber-400 font-black"> 多次觀看 </span>特訓內容，更可獲得<span className="text-white font-black underline decoration-amber-500 underline-offset-8">高額寶石卡獎勵！</span></p>
-                                <button onClick={() => window.open('https://line.me', '_blank')} className="w-full bg-[#00B900] text-white py-5 rounded-[1.25rem] font-black text-sm tracking-widest uppercase hover:brightness-110 mb-4 shadow-xl shadow-green-900/20">透過 LINE 洽詢開通</button>
-                                <button onClick={() => setShowModal(null)} className="text-gray-500 font-bold hover:text-gray-300">暫時離開</button>
+                            <div className="bg-[#1a1f3c] border border-amber-500/40 rounded-[3.5rem] max-w-md w-full p-12 text-center shadow-2xl">
+                                <div className="bg-amber-500/20 w-28 h-28 rounded-full flex items-center justify-center text-amber-400 mx-auto mb-10"><SafeIcon icon={Wand2} size={56} strokeWidth={1} /></div>
+                                <h3 className="text-3xl font-black text-white mb-6 tracking-tight text-center">開啟魔法大門</h3>
+                                <p className="text-gray-400 mb-12 leading-relaxed font-medium text-center">購買科目後即可<span className="text-amber-400 font-black"> 多次觀看 </span>特訓內容，更可獲得<span className="text-white font-black underline decoration-amber-500 underline-offset-8">高額寶石卡獎勵！</span></p>
+                                <button onClick={() => window.open('https://line.me', '_blank')} className="w-full bg-[#00B900] text-white py-5 rounded-[1.25rem] font-black text-sm tracking-[0.3em] uppercase hover:brightness-110 shadow-xl active:scale-95 transition-all mb-4">透過 LINE 洽詢開通</button>
+                                <button onClick={() => setShowModal(null)} className="text-gray-500 font-bold hover:text-gray-300 text-center">暫時離開</button>
                             </div>
                         </div>
                     )}
