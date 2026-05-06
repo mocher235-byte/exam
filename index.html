@@ -332,7 +332,6 @@
                                 {schools.map((school, idx) => (
                                     <div key={idx} className="flex flex-col gap-4 group">
                                         <div className="flex items-center gap-3 mb-2">
-                                            {/* 已刪除圖示方框，保持文字標題 */}
                                             <h4 className="text-xl font-black text-white tracking-widest group-hover:text-amber-400 transition-colors">{school.name}</h4>
                                         </div>
                                         <div className="space-y-3 text-sm text-gray-400 font-medium">
@@ -374,20 +373,40 @@
                     {/* 購買彈窗 */}
                     {showModal === 'buy' && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl transition-all">
-                            <div className="bg-[#0e1122] border border-amber-500/40 rounded-[4rem] max-w-md w-full p-12 text-center relative overflow-hidden">
+                            <div className="bg-[#0e1122] border border-amber-500/40 rounded-[4rem] max-w-md w-full p-8 md:p-12 text-center relative overflow-hidden">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
-                                <div className="bg-amber-500/10 w-24 h-24 rounded-full flex items-center justify-center text-amber-400 mx-auto mb-10 border border-amber-500/20">
-                                    <SafeIcon icon={Wand2} size={48} />
+                                
+                                {/* 頂部裝飾圓圈 */}
+                                <div className="bg-white/5 w-24 h-24 rounded-full flex items-center justify-center text-amber-400 mx-auto mb-8 border border-white/10 shadow-inner">
+                                    <SafeIcon icon={Wand2} size={48} className="opacity-20" />
                                 </div>
-                                <h3 className="text-3xl font-black text-white mb-6">開啟魔法大門</h3>
-                                <p className="text-gray-400 mb-10 leading-relaxed">
-                                    購買科目後即可<span className="text-amber-400 font-black"> 多次觀看 </span>特訓內容，更可獲得<span className="text-white font-black underline decoration-amber-500 underline-offset-8">高額寶石卡獎勵！</span>
-                                </p>
-                                <div className="flex flex-col gap-4">
-                                    <button onClick={() => window.open('https://line.me', '_blank')} className="w-full bg-[#00B900] text-white py-5 rounded-[1.5rem] font-black text-sm tracking-[0.2em] uppercase hover:brightness-110 shadow-xl shadow-green-900/20 flex items-center justify-center gap-3">
+                                
+                                <h3 className="text-3xl md:text-4xl font-black text-white mb-6 tracking-tight">開啟魔法大門</h3>
+                                
+                                {/* 描述文字：支援自動換行與置中 */}
+                                <div className="text-gray-400 mb-10 leading-relaxed text-sm md:text-base px-2">
+                                    <p className="inline md:block">購買科目後即可</p>
+                                    <span className="text-amber-400 font-black mx-1">多次觀看</span>
+                                    <p className="inline md:block">特訓內容，更可獲得</p>
+                                    <div className="relative inline-block md:block mt-1">
+                                        <span className="text-white font-black">高額寶石卡獎勵！</span>
+                                        <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-amber-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex flex-col gap-6">
+                                    {/* LINE 按鈕：使用 image_5c8409.png 中的亮綠色 */}
+                                    <button 
+                                        onClick={() => window.open('https://line.me/ti/p/vQcf6cONnl', '_blank')} 
+                                        className="w-full bg-[#00c300] hover:bg-[#00e600] text-white py-5 rounded-[2rem] font-black text-base md:text-lg tracking-[0.2em] uppercase transition-all shadow-[0_10px_30px_-5px_rgba(0,195,0,0.4)] flex items-center justify-center gap-3 group"
+                                    >
                                         透過 LINE 洽詢開通
                                     </button>
-                                    <button onClick={() => setShowModal(null)} className="py-4 text-gray-500 font-bold hover:text-gray-300 transition-colors text-sm tracking-widest">
+                                    
+                                    <button 
+                                        onClick={() => setShowModal(null)} 
+                                        className="text-gray-500 font-bold hover:text-gray-300 transition-colors text-sm tracking-[0.2em] uppercase"
+                                    >
                                         暫時返回學院
                                     </button>
                                 </div>
